@@ -1,15 +1,15 @@
-﻿using AuthService.Domain.Models;
+﻿using AuthService.Domain.Entities;
 
 namespace AuthService.Domain.Interfaces
 {
     public interface IUserRepository
     {
-        public Guid register (User user);
-        public User? getByEmail (string email);
-        public User? getByUsername (string username);
-        public User? getById (Guid id);
-        public void update (User user);
-        public void deleteById (Guid id);
-	}
+        Task<Guid> Register(User user);
+        Task<List<User>> GetAll();
+        Task<User?> GetByEmail(string email);
+        Task<User?> GetByUsername(string username);
+        Task<User?> GetById(Guid id);
+        Task Update(User user);
+        Task DeleteById(Guid id);
+    }
 }
- 

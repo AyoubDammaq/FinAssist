@@ -1,12 +1,12 @@
 ﻿using AuthService.Domain.Common;
 using AuthService.Domain.Enums;
 
-namespace AuthService.Domain.Models;
+namespace AuthService.Domain.Entities;
 
 public partial class User : BaseEntity
 {
-
-    public string? FirstName { get; set; }
+    public string UserName { get; set; } = null!;
+	public string? FirstName { get; set; }
 
     public string? LastName { get; set; }
 

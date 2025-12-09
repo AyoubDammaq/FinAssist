@@ -1,4 +1,4 @@
-﻿using AuthService.Domain.Models;
+﻿using AuthService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace AuthService.Infrastructure.Data;
@@ -23,7 +23,7 @@ public partial class UserDbContext : DbContext
     {
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("Users_pkey");
+            entity.HasKey(e => e.Id).HasName("Users_pkey");
 
             entity.HasIndex(e => e.Email, "IX_Users_Email");
 
@@ -31,7 +31,7 @@ public partial class UserDbContext : DbContext
 
             entity.HasIndex(e => e.Email, "Users_Email_key").IsUnique();
 
-            entity.Property(e => e.UserId).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.CreatedAt)
                 .HasPrecision(3)
                 .HasDefaultValueSql("now()");
