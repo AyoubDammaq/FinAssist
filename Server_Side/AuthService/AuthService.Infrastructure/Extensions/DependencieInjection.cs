@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace AuthService.Infrastructure.Extensions
 {
@@ -18,46 +19,38 @@ namespace AuthService.Infrastructure.Extensions
 
             services.AddAuthentication(options =>
             {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-				options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-			}).AddCookie(options =>
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
             {
-                options.LoginPath = "/Account/Login";
-                options.LogoutPath = "/Account/Logout";
-                options.Cookie.Name = "Auth";
-				options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                options.Cookie.SameSite = SameSiteMode.Lax;
-
-			}).AddOpenIdConnect(options =>
+                var jwtKey = configuration.GetSection("JwtOptions:Key").Value;
+                if (string.IsNullOrEmpty(jwtKey))
                 {
-                    options.Authority = configuration["Authentication:Authority"];
-                    options.ClientId = configuration["Authentication:ClientId"];
-                    options.ClientSecret = configuration["Authentication:ClientSecret"];
-                    options.CallbackPath = configuration["Authentication:CallbackPath"]; 
-                    
+                    throw new InvalidOperationException("La clé JWT (JwtOptions:Key) ne peut pas être nulle ou vide.");
+                }
 
-                    options.ResponseType = "code";
-                    options.SaveTokens = true;
-                    options.GetClaimsFromUserInfoEndpoint = true;
-                    options.RequireHttpsMetadata = false;
-					options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                    {
-                        NameClaimType = "preferred_username",
-                    };
-				});
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = configuration.GetSection("JwtOptions:Issuer").Value,
+                    ValidAudience = configuration.GetSection("JwtOptions:Audience").Value,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+                };
+            });
             services.AddAuthorizationBuilder();
 
-			services.AddCors(options =>
-			{
-				options.AddDefaultPolicy(policy =>
-				{
-					policy.AllowAnyOrigin()
-						  .AllowAnyHeader()
-						  .AllowAnyMethod();
-				});
-			});
-		}
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
+        }
     }
 }
