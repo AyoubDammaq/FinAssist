@@ -7,15 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Commands\Login\" />
-    <Folder Include="Commands\DeleteUser\" />
-    <Folder Include="Commands\UpdateProfile\" />
-    <Folder Include="Commands\Register\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="16.0.0" />
     <PackageReference Include="MediatR" Version="14.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
   </ItemGroup>
 
   <ItemGroup>

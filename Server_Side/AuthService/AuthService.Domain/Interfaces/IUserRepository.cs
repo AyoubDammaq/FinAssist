@@ -10,6 +10,6 @@ namespace AuthService.Domain.Interfaces
         Task<User?> GetByUsername(string username);
         Task<User?> GetById(Guid id);
         Task Update(User user);
-        Task DeleteById(Guid id);
+        Task Delete(User user);
     }
 }

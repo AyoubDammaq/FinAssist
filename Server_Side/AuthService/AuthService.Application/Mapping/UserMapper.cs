@@ -43,7 +43,27 @@ namespace AuthService.Application.Mapping
 				.ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
 				.ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt));
 
+            CreateMap<UpdateProfileDto, User>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+                .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
+                .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
+                .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.PasswordHash));
 
-		}
+            CreateMap<RegisterRequestDto, User>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.Password));
+
+            CreateMap<RegisterResponseDto, User>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
+
+            CreateMap<LoginRequestDto, User>()
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.Password));
+
+
+        }
     }
 }
