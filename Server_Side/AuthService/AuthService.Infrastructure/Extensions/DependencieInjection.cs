@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using AuthService.Application.Utils;
+using AuthService.Domain.Interfaces;
+using AuthService.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +18,10 @@ namespace AuthService.Infrastructure.Extensions
             services.AddDbContext<Data.UserDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("AuthConnection")));
 
-            services.AddScoped<Domain.Interfaces.IUserRepository, Repositories.UserRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<PasswordManagement>();
+            services.AddScoped<TokenManagement>();
+
 
             services.AddAuthentication(options =>
             {
@@ -41,6 +47,13 @@ namespace AuthService.Infrastructure.Extensions
                 };
             });
             services.AddAuthorizationBuilder();
+
+            // ✅ CORRECTION : Enregistrer MediatR depuis l'assembly Application
+            services.AddMediatR(cfg =>
+                cfg.RegisterServicesFromAssembly(typeof(Application.Queries.GetAllUsers.GetAllUsersQuery).Assembly));
+
+            // ✅ CORRECTION : Enregistrer AutoMapper depuis l'assembly Application
+            services.AddAutoMapper(cfg => { }, typeof(Application.Mapping.UserMapper).Assembly);
 
             services.AddCors(options =>
             {

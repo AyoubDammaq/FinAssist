@@ -10,31 +10,33 @@ namespace AuthService.Application.Mapping
         public UserMapper()
         {
             CreateMap<User, GetAllUsersDto>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName ?? string.Empty))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email ?? string.Empty))
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName ?? string.Empty))
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName ?? string.Empty))
-                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role != null ? src.Role.ToString() : UserRole.User))
+                
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt));
 
             CreateMap<User, GetUserByEmailDto>()
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName ?? string.Empty))
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName ?? string.Empty))
-                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role != null ? src.Role.ToString() : UserRole.User))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.HasValue ? src.Role.Value.ToString() : UserRole.User.ToString()))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt));
 
             CreateMap<User, GetUserByUsernameDto>()
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName ?? string.Empty))
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName ?? string.Empty))
-                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role != null ? src.Role.ToString() : UserRole.User))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.HasValue ? src.Role.Value.ToString() : UserRole.User.ToString()))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt));
 
             CreateMap<User, GetUserByIdDto>()
 				.ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName ?? string.Empty))
 				.ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName ?? string.Empty))
-				.ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role != null ? src.Role.ToString() : UserRole.User))
-				.ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.HasValue ? src.Role.Value.ToString() : UserRole.User.ToString()))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
 				.ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt));
 
             CreateMap<UpdateProfileDto, User>()

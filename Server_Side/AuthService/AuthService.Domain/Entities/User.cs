@@ -14,7 +14,6 @@ public partial class User : BaseEntity
 
     public string PasswordHash { get; set; } = null!;
 
-    public UserRole? Role { get; set; } 
+    public UserRole? Role { get; set; } = UserRole.User;
 
-    public bool IsEmailConfirmed { get; set; }
 }

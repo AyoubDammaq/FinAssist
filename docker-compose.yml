@@ -1,46 +1,44 @@
 services:
-  postgres:
+  db:
     image: postgres:15
-    container_name: keycloak-postgres
+    container_name: finassist-db
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: keycloak
-      POSTGRES_USER: keycloak
-      POSTGRES_PASSWORD: keycloak
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: UserDB
+      # Configuration PostgreSQL supplémentaire
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=en_US.utf8 --lc-ctype=en_US.utf8"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - keycloak-network
+      # Volume persistant pour les données
+      - db-data:/var/lib/postgresql/data
+      # Script d'initialisation de la base de données
+      - ./Server_Side/AuthService/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
+      # Exposition du port PostgreSQL sur la machine hôte
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d UserDB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
-  keycloak:
-    image: quay.io/keycloak/keycloak:23.0
-    container_name: keycloak
+  authservice:
+    build:
+      context: ./Server_Side/AuthService
+      dockerfile: AuthService.API/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
     environment:
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
-      KC_DB_USERNAME: keycloak
-      KC_DB_PASSWORD: keycloak
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_HOSTNAME: localhost
-      KC_HOSTNAME_STRICT: false
-      KC_HTTP_ENABLED: true
+      # la variable de configuration correspondant à "ConnectionStrings:AuthConnection"
+      ConnectionStrings__AuthConnection: "Host=db;Port=5432;Database=UserDB;Username=postgres;Password=postgres"
+      ASPNETCORE_URLS: "http://+:8080"
+      ASPNETCORE_ENVIRONMENT: "Development"
     ports:
       - "8080:8080"
-    volumes:
-      - ./keycloak-data:/opt/keycloak/data
-    depends_on:
-      - postgres
-    command:
-      - start-dev
-    networks:
-      - keycloak-network
+    restart: unless-stopped
 
 volumes:
-  postgres_data:
-  keycloak_data:
-
-networks:
-  keycloak-network:
-    driver: bridge
+  db-data:

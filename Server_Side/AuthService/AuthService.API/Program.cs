@@ -1,4 +1,4 @@
-using AuthService.Infrastructure.Extensions;
+﻿using AuthService.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +17,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(); 
 
-    // Rediriger automatiquement vers Swagger UI � l'ouverture de l'application
+    // Rediriger automatiquement vers Swagger UI à l'ouverture de l'application
     app.Use(async (context, next) =>
     {
         if (context.Request.Path == "/")
