@@ -1,5 +1,6 @@
 ﻿using AuthService.Application.Utils;
 using AuthService.Domain.Interfaces;
+using AuthService.Infrastructure.Data;
 using AuthService.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -11,12 +12,13 @@ using System.Text;
 
 namespace AuthService.Infrastructure.Extensions
 {
-    public static class DependencieInjection
+    public static class DependencieInjectionForServices
     {
         public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<Data.UserDbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString("AuthConnection")));
+            services.AddDbContext<UserDbContext>(options =>
+                options.UseNpgsql(configuration.GetConnectionString("AuthConnection"),
+                    b => b.MigrationsAssembly(typeof(UserDbContext).Assembly.GetName().Name)));
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<PasswordManagement>();
@@ -47,11 +49,6 @@ namespace AuthService.Infrastructure.Extensions
                 };
             });
             services.AddAuthorizationBuilder();
-
-            services.AddMediatR(cfg =>
-                cfg.RegisterServicesFromAssembly(typeof(Application.Queries.GetAllUsers.GetAllUsersQuery).Assembly));
-
-            services.AddAutoMapper(cfg => { }, typeof(Application.Mapping.UserMapper).Assembly);
 
             services.AddCors(options =>
             {
