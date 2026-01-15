@@ -16,13 +16,14 @@ namespace AuthService.Application.Commands.Register
 
         public async Task<RegisterResponseDto> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
+            var existingUser = await _userRepository.GetByEmail(request.registerRequestDto.Email);
+            if (existingUser != null)
+            {
+                throw new ApplicationException($"Le nom d'utilisateur {request.registerRequestDto.Email} est déjà pris.");
+            }
+            
             try
             {
-                var existingUser = await _userRepository.GetByEmail(request.registerRequestDto.Email);
-                if (existingUser != null)
-                {
-                    throw new ApplicationException($"Le nom d'utilisateur {request.registerRequestDto.Email} est déjà pris.");
-                }
                 var user = _mapper.Map<User>(request.registerRequestDto);
                 var passwordHasher = new PasswordHasher<User>();
                 user.PasswordHash = passwordHasher.HashPassword(user, request.registerRequestDto.Password);

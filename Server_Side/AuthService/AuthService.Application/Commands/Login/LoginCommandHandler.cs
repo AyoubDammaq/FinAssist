@@ -18,7 +18,7 @@ namespace AuthService.Application.Commands.Login
             try
             {
                 var user = await _userRepository.GetByEmail(request.loginRequestDto.Email);
-                var isPasswordValid = user != null && await _passwordManagement.VerifyPassword(request.loginRequestDto.Password, user.PasswordHash, user.PasswordHash);
+                var isPasswordValid = user != null && await _passwordManagement.VerifyPassword(request.loginRequestDto.Password, user.PasswordHash, user);
                 if (user == null || !isPasswordValid)
                 {
                     throw new UnauthorizedAccessException("Nom d'utilisateur ou mot de passe incorrect.");

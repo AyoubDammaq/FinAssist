@@ -48,11 +48,9 @@ namespace AuthService.Infrastructure.Extensions
             });
             services.AddAuthorizationBuilder();
 
-            // ✅ CORRECTION : Enregistrer MediatR depuis l'assembly Application
             services.AddMediatR(cfg =>
                 cfg.RegisterServicesFromAssembly(typeof(Application.Queries.GetAllUsers.GetAllUsersQuery).Assembly));
 
-            // ✅ CORRECTION : Enregistrer AutoMapper depuis l'assembly Application
             services.AddAutoMapper(cfg => { }, typeof(Application.Mapping.UserMapper).Assembly);
 
             services.AddCors(options =>

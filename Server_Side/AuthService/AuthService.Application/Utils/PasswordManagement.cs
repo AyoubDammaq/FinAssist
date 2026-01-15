@@ -1,19 +1,19 @@
-﻿using System.Security.Cryptography;
+﻿using AuthService.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Cryptography;
 
 namespace AuthService.Application.Utils
 {
     public class PasswordManagement
     {
-        public Task<bool> VerifyPassword(string enteredPassword, string storedHash, string storedSalt)
+        public Task<bool> VerifyPassword(string enteredPassword, string storedHashedPassword, User userFromDb)
         {
             try
             {
-                using (var hmac = new HMACSHA512(Convert.FromBase64String(storedSalt)))
-                {
-                    var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(enteredPassword));
-                    var storedHashBytes = Convert.FromBase64String(storedHash);
-                    return Task.FromResult(computedHash.SequenceEqual(storedHashBytes));
-                }
+                var passwordHasher = new PasswordHasher<User>();
+                var result = passwordHasher.VerifyHashedPassword(userFromDb, storedHashedPassword, enteredPassword);
+                return Task.FromResult(result == PasswordVerificationResult.Success
+                                       || result == PasswordVerificationResult.SuccessRehashNeeded);
             }
             catch (Exception ex)
             {

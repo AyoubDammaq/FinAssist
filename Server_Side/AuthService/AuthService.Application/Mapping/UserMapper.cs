@@ -53,7 +53,8 @@ namespace AuthService.Application.Mapping
 
             CreateMap<RegisterResponseDto, User>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
-                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ReverseMap();
 
             CreateMap<LoginRequestDto, User>()
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
