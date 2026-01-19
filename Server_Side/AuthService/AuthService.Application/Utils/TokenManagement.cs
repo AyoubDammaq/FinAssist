@@ -51,6 +51,16 @@ namespace AuthService.Application.Utils
             }
         }
 
+        public Task<string> GenerateResetToken()
+        {
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Task.FromResult(Convert.ToBase64String(randomNumber));
+            }
+        }
+
         public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
         {
             var jwtKey = configuration["Jwt:Key"];

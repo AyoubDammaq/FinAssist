@@ -2,8 +2,7 @@
 using AuthService.Domain.Interfaces;
 using AuthService.Infrastructure.Data;
 using AuthService.Infrastructure.Repositories;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,18 +23,16 @@ namespace AuthService.Infrastructure.Extensions
             services.AddScoped<PasswordManagement>();
             services.AddScoped<TokenManagement>();
 
-
             services.AddAuthentication(options =>
             {
-                options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
             {
-                var jwtKey = configuration.GetSection("JwtOptions:Key").Value;
-                if (string.IsNullOrEmpty(jwtKey))
-                {
-                    throw new InvalidOperationException("La clé JWT (JwtOptions:Key) ne peut pas être nulle ou vide.");
-                }
+                var jwtKey = configuration["Jwt:Key"];
+                if (string.IsNullOrWhiteSpace(jwtKey))
+                    throw new InvalidOperationException("La clé JWT (Jwt:Key) ne peut pas être nulle ou vide.");
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -43,12 +40,13 @@ namespace AuthService.Infrastructure.Extensions
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = configuration.GetSection("JwtOptions:Issuer").Value,
-                    ValidAudience = configuration.GetSection("JwtOptions:Audience").Value,
+                    ValidIssuer = configuration["Jwt:Issuer"],
+                    ValidAudience = configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
                 };
             });
-            services.AddAuthorizationBuilder();
+
+            services.AddAuthorization();
 
             services.AddCors(options =>
             {

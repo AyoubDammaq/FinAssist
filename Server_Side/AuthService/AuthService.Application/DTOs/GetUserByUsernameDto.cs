@@ -1,15 +1,35 @@
-﻿using AuthService.Domain.Enums;
+﻿using System.ComponentModel.DataAnnotations;
+using AuthService.Domain.Enums;
 
 namespace AuthService.Application.DTOs
 {
     public class GetUserByUsernameDto
     {
-		public string Email { get; set; } = string.Empty;
-		public string FirstName { get; set; } = string.Empty;
-		public string LastName { get; set; } = string.Empty;
-		public UserRole Role { get; set; } = UserRole.User;
-        public bool IsActive { get; set; } = true;
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-		public DateTime UpdatedAt { get; set; } = DateTime.Now;
-	}
+        [Required]
+        public Guid Id { get; set; }
+
+        [Required]
+        [EmailAddress]
+        [StringLength(256)]
+        public string Email { get; set; } = string.Empty;
+
+        [StringLength(100)]
+        public string? FirstName { get; set; }
+
+        [StringLength(100)]
+        public string? LastName { get; set; }
+
+        [Phone]
+        [StringLength(20)]
+        public string? PhoneNumber { get; set; }
+
+        public UserRole? Role { get; set; }
+
+        public bool IsActive { get; set; }
+
+        [Required]
+        public DateTime CreatedAt { get; set; }
+
+        public DateTime? UpdatedAt { get; set; }
+    }
 }

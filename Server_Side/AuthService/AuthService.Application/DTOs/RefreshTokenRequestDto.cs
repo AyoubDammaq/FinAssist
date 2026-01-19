@@ -2,12 +2,12 @@
 
 namespace AuthService.Application.DTOs
 {
-    public class LoginResponseDto
+    public sealed class RefreshTokenRequestDto
     {
-        [Required]
-        public string AccessToken { get; set; } = null!;
+        public Guid Id { get; set; }
 
         [Required]
+        [StringLength(500)]
         public string RefreshToken { get; set; } = null!;
     }
 }
