@@ -6,11 +6,11 @@ using MediatR;
 
 namespace AuthService.Application.Commands.Login
 {
-    public class LoginCommandHandler(IUserRepository userRepository, PasswordManagement passwordManagement, TokenManagement tokenManagement, IMapper mapper) : IRequestHandler<LoginCommand, LoginResponseDto>
+    public class LoginCommandHandler(IUserRepository userRepository, IPasswordManagement passwordManagement, ITokenManagement tokenManagement, IMapper mapper) : IRequestHandler<LoginCommand, LoginResponseDto>
     {
         public readonly IUserRepository _userRepository = userRepository;   
-        public readonly PasswordManagement _passwordManagement = passwordManagement;
-        public readonly TokenManagement _tokenManagement = tokenManagement;
+        public readonly IPasswordManagement _passwordManagement = passwordManagement;
+        public readonly ITokenManagement _tokenManagement = tokenManagement;
         public readonly IMapper _mapper = mapper;
 
         public async Task<LoginResponseDto> Handle(LoginCommand request, CancellationToken cancellationToken)

@@ -7,11 +7,11 @@ namespace AuthService.Application.Commands.RefreshToken
 {
     public sealed class RefreshTokenCommandHandler(
         IUserRepository userRepository,
-        TokenManagement tokenManagement)
+        ITokenManagement tokenManagement)
         : IRequestHandler<RefreshTokenCommand, RefreshTokenResponseDto>
     {
         private readonly IUserRepository _userRepository = userRepository;
-        private readonly TokenManagement _tokenManagement = tokenManagement;
+        private readonly ITokenManagement _tokenManagement = tokenManagement;
 
         public async Task<RefreshTokenResponseDto> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {

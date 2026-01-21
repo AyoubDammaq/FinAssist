@@ -8,10 +8,10 @@ using Microsoft.AspNetCore.Identity;
 
 namespace AuthService.Application.Commands.Register
 {
-    public class RegisterCommandHandler(IUserRepository userRepository, PasswordManagement passwordManagement, IMapper mapper) : IRequestHandler<RegisterCommand, RegisterResponseDto>
+    public class RegisterCommandHandler(IUserRepository userRepository, IPasswordManagement passwordManagement, IMapper mapper) : IRequestHandler<RegisterCommand, RegisterResponseDto>
     {
         public readonly IUserRepository _userRepository = userRepository;
-        public readonly PasswordManagement _passwordManagement = passwordManagement;
+        public readonly IPasswordManagement _passwordManagement = passwordManagement;
         public readonly IMapper _mapper = mapper;
 
         public async Task<RegisterResponseDto> Handle(RegisterCommand request, CancellationToken cancellationToken)

@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 
 namespace AuthService.Application.Utils
 {
-    public class PasswordManagement
+    public class PasswordManagement : IPasswordManagement
     {
         public Task<bool> VerifyPassword(string enteredPassword, string storedHashedPassword, User userFromDb)
         {

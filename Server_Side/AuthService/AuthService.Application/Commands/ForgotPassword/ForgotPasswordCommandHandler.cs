@@ -6,11 +6,11 @@ namespace AuthService.Application.Commands.ForgotPassword
 {
     public sealed class ForgotPasswordCommandHandler(
         IUserRepository userRepository,
-        TokenManagement tokenManagement)
+        ITokenManagement tokenManagement)
         : IRequestHandler<ForgotPasswordCommand, Unit>
     {
         private readonly IUserRepository _userRepository = userRepository;
-        private readonly TokenManagement _tokenManagement = tokenManagement;
+        private readonly ITokenManagement _tokenManagement = tokenManagement;
 
         public async Task<Unit> Handle(ForgotPasswordCommand request, CancellationToken cancellationToken)
         {

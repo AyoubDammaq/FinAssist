@@ -1,4 +1,6 @@
 ﻿using AuthService.Application.Utils;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +16,10 @@ namespace AuthService.Infrastructure.Extensions
 
             // Enregistrement d'AutoMapper avec tous les profils de l'assembly Application
             services.AddAutoMapper(cfg => { }, typeof(Application.Mapping.UserMapper).Assembly);
+
+            // ✅ FluentValidation : enregistre tous les validators de l'assembly Application
+            services.AddFluentValidationAutoValidation();
+            services.AddValidatorsFromAssembly(typeof(Application.Commands.Login.LoginCommandValidator).Assembly);
 
             // Enregistrement des services Utils
             services.AddScoped<PasswordManagement>();

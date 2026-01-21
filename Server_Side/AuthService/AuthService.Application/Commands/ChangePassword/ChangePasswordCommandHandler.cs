@@ -6,11 +6,11 @@ namespace AuthService.Application.Commands.ChangePassword
 {
     public sealed class ChangePasswordCommandHandler(
         IUserRepository userRepository,
-        PasswordManagement passwordManagement)
+        IPasswordManagement passwordManagement)
         : IRequestHandler<ChangePasswordCommand, Unit>
     {
         private readonly IUserRepository _userRepository = userRepository;
-        private readonly PasswordManagement _passwordManagement = passwordManagement;
+        private readonly IPasswordManagement _passwordManagement = passwordManagement;
 
         public async Task<Unit> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
         {

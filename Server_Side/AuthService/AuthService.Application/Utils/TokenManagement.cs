@@ -7,7 +7,7 @@ using System.Security.Cryptography;
 
 namespace AuthService.Application.Utils
 {
-    public class TokenManagement(IConfiguration configuration)
+    public class TokenManagement(IConfiguration configuration) : ITokenManagement
     {
         public Task<string> GenerateToken(User user)
         {

@@ -6,11 +6,11 @@ namespace AuthService.Application.Commands.ResetPassword
 {
     public sealed class ResetPasswordCommandHandler(
         IUserRepository userRepository,
-        PasswordManagement passwordManagement)
+        IPasswordManagement passwordManagement)
         : IRequestHandler<ResetPasswordCommand, Unit>
     {
         private readonly IUserRepository _userRepository = userRepository;
-        private readonly PasswordManagement _passwordManagement = passwordManagement;
+        private readonly IPasswordManagement _passwordManagement = passwordManagement;
 
         public async Task<Unit> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
         {

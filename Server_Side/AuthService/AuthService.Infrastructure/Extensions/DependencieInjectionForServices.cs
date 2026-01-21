@@ -20,8 +20,8 @@ namespace AuthService.Infrastructure.Extensions
                     b => b.MigrationsAssembly(typeof(UserDbContext).Assembly.GetName().Name)));
 
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<PasswordManagement>();
-            services.AddScoped<TokenManagement>();
+            services.AddScoped<IPasswordManagement, PasswordManagement>();
+            services.AddScoped<ITokenManagement, TokenManagement>();
 
             services.AddAuthentication(options =>
             {
