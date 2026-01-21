@@ -1,7 +1,6 @@
-﻿using AuthService.Domain.Entities;
-using MediatR;
+﻿using MediatR;
 
 namespace AuthService.Application.Commands.Logout
 {
-    public record LogoutCommand(User user) : IRequest<Unit>;
+    public record LogoutCommand(string email) : IRequest<Unit>;
 }

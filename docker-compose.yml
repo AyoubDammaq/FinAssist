@@ -3,7 +3,7 @@ services:
     build:
       context: ./Server_Side/AuthService/db
       dockerfile: Dockerfile.db
-    image: ayoub966/auth-db:1.0.0
+    image: ayoub966/auth-db:1.0.1
     container_name: finassist-db
     restart: unless-stopped
     environment:
@@ -27,7 +27,7 @@ services:
     build:
       context: ./Server_Side/AuthService
       dockerfile: AuthService.API/Dockerfile
-    image: ayoub966/authservice:1.0.0
+    image: ayoub966/authservice:1.0.1
     depends_on:
       db:
         condition: service_healthy

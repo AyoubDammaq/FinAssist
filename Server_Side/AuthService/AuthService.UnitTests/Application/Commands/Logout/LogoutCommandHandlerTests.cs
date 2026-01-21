@@ -14,12 +14,14 @@ public sealed class LogoutCommandHandlerTests
     {
         // Arrange
         var userId = Guid.NewGuid();
+        var userEmail = "a@b.com";
 
         var repo = new Mock<IUserRepository>(MockBehavior.Strict);
-        repo.Setup(r => r.GetById(userId)).ReturnsAsync((User?)null);
+        // Setup must match handler (GetByEmail)
+        repo.Setup(r => r.GetByEmail(userEmail)).ReturnsAsync((User?)null);
 
         var sut = new LogoutCommandHandler(repo.Object);
-        var cmd = new LogoutCommand(new User { Id = userId, Email = "a@b.com", UserName = "user", PasswordHash = "hash" });
+        var cmd = new LogoutCommand(userEmail);
 
         // Act
         var result = await sut.Handle(cmd, CancellationToken.None);
@@ -35,10 +37,11 @@ public sealed class LogoutCommandHandlerTests
     {
         // Arrange
         var userId = Guid.NewGuid();
+        var userEmail = "a@b.com";
         var userFromDb = new User
         {
             Id = userId,
-            Email = "a@b.com",
+            Email = userEmail,
             UserName = "user",
             PasswordHash = "hash",
             RefreshToken = "refresh.old",
@@ -46,11 +49,12 @@ public sealed class LogoutCommandHandlerTests
         };
 
         var repo = new Mock<IUserRepository>(MockBehavior.Strict);
-        repo.Setup(r => r.GetById(userId)).ReturnsAsync(userFromDb);
+        // Setup must match handler (GetByEmail)
+        repo.Setup(r => r.GetByEmail(userEmail)).ReturnsAsync(userFromDb);
         repo.Setup(r => r.Update(It.IsAny<User>())).Returns(Task.CompletedTask);
 
         var sut = new LogoutCommandHandler(repo.Object);
-        var cmd = new LogoutCommand(new User { Id = userId, Email = "a@b.com", UserName = "user", PasswordHash = "hash" });
+        var cmd = new LogoutCommand(userEmail);
 
         // Act
         var result = await sut.Handle(cmd, CancellationToken.None);

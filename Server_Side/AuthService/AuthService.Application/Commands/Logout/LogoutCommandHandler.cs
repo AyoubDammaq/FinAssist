@@ -9,7 +9,7 @@ namespace AuthService.Application.Commands.Logout
 
         public async Task<Unit> Handle(LogoutCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.GetById(request.user.Id);
+            var user = await _userRepository.GetByEmail(request.email);
             if (user is null)
                 return Unit.Value;
 

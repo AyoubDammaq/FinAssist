@@ -13,7 +13,6 @@ using AuthService.Application.Queries.GetUserByEmail;
 using AuthService.Application.Queries.GetUserById;
 using AuthService.Application.Queries.GetUserByUsername;
 using AuthService.Application.Queries.Health;
-using AuthService.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -95,11 +94,11 @@ namespace AuthService.API.Controllers
         [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Logout([FromBody] User user)
+        public async Task<IActionResult> Logout([FromBody] string email)
         {
             try
             {
-                var command = new LogoutCommand(user);
+                var command = new LogoutCommand(email);
                 var result = await _mediator.Send(command);
                 return Ok(result);
             }
