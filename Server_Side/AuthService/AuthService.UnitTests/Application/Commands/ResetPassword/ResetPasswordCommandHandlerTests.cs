@@ -62,6 +62,7 @@ public sealed class ResetPasswordCommandHandlerTests
         repo.Setup(r => r.GetByEmail("a@b.com")).ReturnsAsync((User?)null);
 
         var password = new Mock<IPasswordManagement>(MockBehavior.Strict);
+        password.Setup(p => p.IsPasswordStrong(It.IsAny<string>())).ReturnsAsync(true);
 
         var sut = new ResetPasswordCommandHandler(repo.Object, password.Object);
 
@@ -97,6 +98,7 @@ public sealed class ResetPasswordCommandHandlerTests
         repo.Setup(r => r.GetByEmail("a@b.com")).ReturnsAsync(user);
 
         var password = new Mock<IPasswordManagement>(MockBehavior.Strict);
+        password.Setup(p => p.IsPasswordStrong(It.IsAny<string>())).ReturnsAsync(true);
 
         var sut = new ResetPasswordCommandHandler(repo.Object, password.Object);
 
@@ -133,6 +135,7 @@ public sealed class ResetPasswordCommandHandlerTests
         repo.Setup(r => r.GetByEmail("a@b.com")).ReturnsAsync(user);
 
         var password = new Mock<IPasswordManagement>(MockBehavior.Strict);
+        password.Setup(p => p.IsPasswordStrong(It.IsAny<string>())).ReturnsAsync(true);
 
         var sut = new ResetPasswordCommandHandler(repo.Object, password.Object);
 
@@ -169,6 +172,7 @@ public sealed class ResetPasswordCommandHandlerTests
         repo.Setup(r => r.GetByEmail("a@b.com")).ReturnsAsync(user);
 
         var password = new Mock<IPasswordManagement>(MockBehavior.Strict);
+        password.Setup(p => p.IsPasswordStrong(It.IsAny<string>())).ReturnsAsync(true);
 
         var sut = new ResetPasswordCommandHandler(repo.Object, password.Object);
 
@@ -207,6 +211,7 @@ public sealed class ResetPasswordCommandHandlerTests
         repo.Setup(r => r.Update(It.IsAny<User>())).Returns(Task.CompletedTask);
 
         var password = new Mock<IPasswordManagement>(MockBehavior.Strict);
+        password.Setup(p => p.IsPasswordStrong(It.IsAny<string>())).ReturnsAsync(true);
         password.Setup(p => p.HashPassword("New#12345")).ReturnsAsync(("hash.new", "salt"));
 
         var sut = new ResetPasswordCommandHandler(repo.Object, password.Object);

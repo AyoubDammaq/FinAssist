@@ -29,6 +29,12 @@ namespace AuthService.Application.Commands.ResetPassword
                 throw new ArgumentException("Les mots de passe ne correspondent pas.");
             }
 
+            var isStrong = await _passwordManagement.IsPasswordStrong(dto.NewPassword);
+            if (!isStrong)
+            {
+                throw new ArgumentException("Le mot de passe n'est pas assez fort.");
+            }
+
             var user = await _userRepository.GetByEmail(dto.Email);
 
             if (user == null)

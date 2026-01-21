@@ -21,7 +21,13 @@ namespace AuthService.Application.Commands.Register
             {
                 throw new ApplicationException($"Le nom d'utilisateur {request.registerRequestDto.Email} est déjà pris.");
             }
-            
+
+            var isStrong = await _passwordManagement.IsPasswordStrong(request.registerRequestDto.Password);
+            if (!isStrong)
+            {
+                throw new ArgumentException("Le mot de passe n'est pas assez fort.");
+            }
+
             try
             {
                 var user = _mapper.Map<User>(request.registerRequestDto);

@@ -1,0 +1,4 @@
+FROM postgres:15
+# Copier des scripts d'init si vous en avez
+COPY ./init.sql /docker-entrypoint-initdb.d/init.sql
+# Ajoutez ici toute configuration supplémentaire si nécessaire

@@ -51,7 +51,11 @@ public sealed class RegisterCommandHandlerTests
         repo.Setup(r => r.GetByEmail("a@b.com")).ReturnsAsync((User?)null);
         repo.Setup(r => r.Register(It.IsAny<User>())).ReturnsAsync(Guid.NewGuid());
 
+        // Mock du password pour renvoyer "fort"
         var password = new Mock<IPasswordManagement>(MockBehavior.Loose);
+        password.Setup(p => p.IsPasswordStrong(It.IsAny<string>()))
+                .ReturnsAsync(true);
+
         var mapper = MapperFactory.Create();
 
         var sut = new RegisterCommandHandler(repo.Object, password.Object, mapper);

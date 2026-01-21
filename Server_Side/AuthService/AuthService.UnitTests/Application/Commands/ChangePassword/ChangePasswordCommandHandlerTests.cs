@@ -66,6 +66,7 @@ public sealed class ChangePasswordCommandHandlerTests
         repo.Setup(r => r.GetById(userId)).ReturnsAsync((User?)null);
 
         var password = new Mock<IPasswordManagement>(MockBehavior.Strict);
+        password.Setup(p => p.IsPasswordStrong(It.IsAny<string>())).ReturnsAsync(true);
 
         var sut = new ChangePasswordCommandHandler(repo.Object, password.Object);
 
@@ -96,6 +97,7 @@ public sealed class ChangePasswordCommandHandlerTests
         repo.Setup(r => r.GetById(userId)).ReturnsAsync(user);
 
         var password = new Mock<IPasswordManagement>(MockBehavior.Strict);
+        password.Setup(p => p.IsPasswordStrong(It.IsAny<string>())).ReturnsAsync(true);
         password.Setup(p => p.VerifyPassword("bad", "hash", user)).ReturnsAsync(false);
 
         var sut = new ChangePasswordCommandHandler(repo.Object, password.Object);
@@ -136,6 +138,7 @@ public sealed class ChangePasswordCommandHandlerTests
         repo.Setup(r => r.Update(It.IsAny<User>())).Returns(Task.CompletedTask);
 
         var password = new Mock<IPasswordManagement>(MockBehavior.Strict);
+        password.Setup(p => p.IsPasswordStrong(It.IsAny<string>())).ReturnsAsync(true);
         password.Setup(p => p.VerifyPassword("Old#12345", "hash", user)).ReturnsAsync(true);
         password.Setup(p => p.HashPassword("New#12345")).ReturnsAsync(("newhash", "salt"));
 
