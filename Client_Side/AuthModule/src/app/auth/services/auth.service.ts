@@ -133,23 +133,23 @@ export class AuthService {
 
     // Essayer d'abord avec les données de la réponse API
     let userId = response.userId;
-    let username = response.username;
+    let userName = response.userName;
     let email = response.email;
 
     // Si les données ne sont pas dans la réponse, les extraire du token
-    if (!userId || !username || !email) {
+    if (!userId || !userName || !email) {
       console.log('⚠️ User info incomplete in API response, extracting from token...');
       const tokenInfo = this.getUserInfoFromToken();
       if (tokenInfo) {
         userId = userId || tokenInfo.id || '';
-        username = username || tokenInfo.username || '';
+        userName = userName || tokenInfo.userName || '';
         email = email || tokenInfo.email || '';
       }
     }
 
     const user: UserDto = {
       id: userId,
-      username: username,
+      userName: userName,
       email: email,
       createdAt: new Date(),
     };
@@ -249,15 +249,26 @@ export class AuthService {
         decodedPayload.email || 
         decodedPayload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'];
       
-      const username = 
+      const userName = 
         decodedPayload.unique_name || 
         decodedPayload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] ||
         decodedPayload.username;
+      
+      const roleString = 
+        decodedPayload.role || 
+        decodedPayload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+      
+      // Convert role string to number: "Admin" = 0, "User" = 1
+      let roleNumber: number | undefined;
+      if (roleString) {
+        roleNumber = roleString === 'Admin' ? 0 : 1;
+      }
 
       return {
         id: userId,
         email: email,
-        username: username,
+        userName: userName,
+        role: roleNumber,
         createdAt: new Date()
       };
     } catch (error) {
@@ -271,12 +282,12 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  private handleError(error: any): Observable<never> {
+  private readonly handleError = (error: any): Observable<never> => {
     this.logErrorDetails(error);
     const errorMessage = this.extractErrorMessage(error);
     console.log('✅ Final extracted message:', errorMessage);
-    return throwError(() => new Error(errorMessage));
-  }
+    return throwError(() => errorMessage);
+  };
 
   private logErrorDetails(error: any): void {
     console.group('🔴 API ERROR DETAILS');

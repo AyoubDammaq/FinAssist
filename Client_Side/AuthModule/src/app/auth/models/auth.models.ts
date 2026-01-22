@@ -30,11 +30,11 @@ export interface ResetPasswordRequestDto {
 }
 
 export interface UpdateProfileDto {
-  userId: string;
-  username?: string;
-  email?: string;
+  id: string;
+  userName: string;
   firstName?: string;
   lastName?: string;
+  phoneNumber?: string;
 }
 
 // Response DTOs
@@ -42,17 +42,22 @@ export interface AuthResponseDto {
   accessToken: string;
   refreshToken: string;
   userId: string;
-  username: string;
+  userName: string;
   email: string;
   expiresIn: number;
 }
 
 export interface UserDto {
   id: string;
-  username: string;
+  userName: string;
   email: string;
   firstName?: string;
   lastName?: string;
+  phoneNumber?: string;
+  role?: number; // 0 = Admin, 1 = User
+  isEmailConfirmed?: boolean;
+  isActive?: boolean;
+  isLocked?: boolean;
   createdAt: Date;
   updatedAt?: Date;
 }
