@@ -126,18 +126,40 @@ export class AuthService {
   // Gestion des tokens et état de l'utilisateur
 
   private handleAuthResponse(response: AuthResponseDto): void {
+    console.log('🔐 Auth Response:', response);
+    
     localStorage.setItem(this.TOKEN_KEY, response.accessToken);
     localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
 
+    // Essayer d'abord avec les données de la réponse API
+    let userId = response.userId;
+    let username = response.username;
+    let email = response.email;
+
+    // Si les données ne sont pas dans la réponse, les extraire du token
+    if (!userId || !username || !email) {
+      console.log('⚠️ User info incomplete in API response, extracting from token...');
+      const tokenInfo = this.getUserInfoFromToken();
+      if (tokenInfo) {
+        userId = userId || tokenInfo.id || '';
+        username = username || tokenInfo.username || '';
+        email = email || tokenInfo.email || '';
+      }
+    }
+
     const user: UserDto = {
-      id: response.userId,
-      username: response.username,
-      email: response.email,
+      id: userId,
+      username: username,
+      email: email,
       createdAt: new Date(),
     };
 
+    console.log('👤 User to be stored:', user);
+    
     localStorage.setItem(this.USER_KEY, JSON.stringify(user));
     this.currentUserSubject.next(user);
+    
+    console.log('✅ User stored in localStorage');
   }
 
   private clearAuthData(): void {
@@ -168,25 +190,171 @@ export class AuthService {
     return !!token;
   }
 
+  /**
+   * Extrait l'ID de l'utilisateur depuis le token JWT
+   * @returns L'ID de l'utilisateur ou null si non trouvé
+   */
+  getUserIdFromToken(): string | null {
+    const token = this.getToken();
+    if (!token) {
+      return null;
+    }
+
+    try {
+      // Décoder le payload JWT (la partie entre les deux points)
+      const payload = token.split('.')[1];
+      const decodedPayload = JSON.parse(atob(payload));
+      
+      console.log('🔍 Decoded JWT payload:', decodedPayload);
+      
+      // Les claims possibles pour l'ID utilisateur en ASP.NET
+      // "sub" (standard JWT), "nameid", ou "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+      const userId = 
+        decodedPayload.sub || 
+        decodedPayload.nameid || 
+        decodedPayload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ||
+        decodedPayload.userId ||
+        decodedPayload.id;
+      
+      console.log('👤 Extracted User ID:', userId);
+      
+      return userId || null;
+    } catch (error) {
+      console.error('Error decoding JWT token:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Extrait les informations utilisateur complètes depuis le token JWT
+   * @returns Objet avec les informations de l'utilisateur
+   */
+  getUserInfoFromToken(): Partial<UserDto> | null {
+    const token = this.getToken();
+    if (!token) {
+      return null;
+    }
+
+    try {
+      const payload = token.split('.')[1];
+      const decodedPayload = JSON.parse(atob(payload));
+      
+      // Extraire les informations courantes
+      const userId = 
+        decodedPayload.sub || 
+        decodedPayload.nameid || 
+        decodedPayload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+      
+      const email = 
+        decodedPayload.email || 
+        decodedPayload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'];
+      
+      const username = 
+        decodedPayload.unique_name || 
+        decodedPayload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] ||
+        decodedPayload.username;
+
+      return {
+        id: userId,
+        email: email,
+        username: username,
+        createdAt: new Date()
+      };
+    } catch (error) {
+      console.error('Error extracting user info from token:', error);
+      return null;
+    }
+  }
+
   logoutLocal(): void {
     this.clearAuthData();
     this.router.navigate(['/login']);
   }
 
   private handleError(error: any): Observable<never> {
-    let errorMessage = 'Une erreur est survenue';
+    this.logErrorDetails(error);
+    const errorMessage = this.extractErrorMessage(error);
+    console.log('✅ Final extracted message:', errorMessage);
+    return throwError(() => new Error(errorMessage));
+  }
 
+  private logErrorDetails(error: any): void {
+    console.group('🔴 API ERROR DETAILS');
+    console.log('1. Error Status:', error.status);
+    console.log('2. Error StatusText:', error.statusText);
+    console.log('3. Error Object:', error);
+    console.log('4. Error.error type:', typeof error.error);
+    console.log('5. Error.error value:', error.error);
+
+    if (error.error) {
+      console.log('6. Error.error keys:', Object.keys(error.error));
+      console.log('7. Error.error.Message:', error.error.Message);
+      console.log('8. Error.error.message:', error.error.message);
+      console.log('9. Error.error.ErrorCode:', error.error.ErrorCode);
+      console.log('10. Error.error stringified:', JSON.stringify(error.error));
+    }
+    console.groupEnd();
+  }
+
+  private extractErrorMessage(error: any): string {
     if (error.error instanceof ErrorEvent) {
-      // Erreur côté client
-      errorMessage = error.error.message;
-    } else if (error.error?.message) {
-      // Erreur côté serveur
-      errorMessage = error.error.message;
-    } else if (error.message) {
-      errorMessage = error.message;
+      return error.error.message;
     }
 
-    console.error('API Error:', errorMessage);
-    return throwError(() => new Error(errorMessage));
+    if (error.error) {
+      return this.parseErrorBody(error.error);
+    }
+
+    return error.message || 'Une erreur est survenue';
+  }
+
+  private parseErrorBody(errorBody: any): string {
+    // 1. Erreur de validation ASP.NET Core
+    const validationMessage = this.extractValidationErrors(errorBody);
+    if (validationMessage) {
+      return validationMessage;
+    }
+
+    // 2. Nouvelle structure API: { Message: string, ErrorCode: string, Details?: any }
+    if (errorBody.Message && typeof errorBody.Message === 'string') {
+      return errorBody.Message;
+    }
+
+    // 3. Ancienne structure: { message: string }
+    if (errorBody.message && typeof errorBody.message === 'string') {
+      return errorBody.message;
+    }
+
+    // 4. Simple title
+    if (errorBody.title && typeof errorBody.title === 'string') {
+      return errorBody.title;
+    }
+
+    // 5. Réponse simple string
+    if (typeof errorBody === 'string') {
+      return errorBody;
+    }
+
+    return 'Une erreur est survenue';
+  }
+
+  private extractValidationErrors(errorBody: any): string | null {
+    if (!errorBody.errors || typeof errorBody.errors !== 'object') {
+      return null;
+    }
+
+    const validationErrors: string[] = [];
+    for (const field in errorBody.errors) {
+      const fieldErrors = errorBody.errors[field];
+      if (Array.isArray(fieldErrors)) {
+        validationErrors.push(...fieldErrors);
+      }
+    }
+
+    if (validationErrors.length > 0) {
+      return validationErrors.join(' ');
+    }
+
+    return errorBody.title || null;
   }
 }

@@ -28,19 +28,40 @@ export class Me implements OnInit {
     // Récupérer l'utilisateur du localStorage
     this.user = this.authService.getCurrentUser();
 
+    // Si pas d'utilisateur dans localStorage, essayer d'extraire du token
+    if (!this.user) {
+      const tokenInfo = this.authService.getUserInfoFromToken();
+      if (tokenInfo?.id) {
+        this.user = tokenInfo as UserDto;
+      }
+    }
+
     if (this.user) {
-      // Optionnel: Récupérer les données complètes depuis l'API
-      this.authService.getUserById(this.user.id).subscribe({
-        next: (userData) => {
-          this.user = userData;
-          this.isLoading = false;
-        },
-        error: (error) => {
-          console.error('Error fetching user:', error);
-          // Utiliser les données du localStorage en cas d'erreur
-          this.isLoading = false;
-        },
-      });
+      // Obtenir l'ID depuis le token si nécessaire
+      let userId = this.user.id;
+      if (!userId || userId === 'undefined') {
+        userId = this.authService.getUserIdFromToken() || '';
+      }
+
+      // Vérifier si l'ID existe avant d'appeler l'API
+      if (userId && userId !== 'undefined') {
+        // Récupérer les données complètes depuis l'API
+        this.authService.getUserById(userId).subscribe({
+          next: (userData) => {
+            this.user = userData;
+            this.isLoading = false;
+          },
+          error: (error) => {
+            console.error('Error fetching user:', error);
+            // Utiliser les données du localStorage/token en cas d'erreur
+            this.isLoading = false;
+          },
+        });
+      } else {
+        // Pas d'ID valide, utiliser uniquement les données du localStorage
+        console.warn('No valid user ID found, using localStorage data only');
+        this.isLoading = false;
+      }
     } else {
       this.isLoading = false;
       this.errorMessage = 'Utilisateur non trouvé';
@@ -48,7 +69,7 @@ export class Me implements OnInit {
   }
 
   getInitials(): string {
-    if (!this.user) return '';
+    if (!this.user?.username) return '';
 
     if (this.user.firstName && this.user.lastName) {
       return `${this.user.firstName[0]}${this.user.lastName[0]}`.toUpperCase();

@@ -55,8 +55,13 @@ export class Register {
       this.isSubmitting = true;
       this.errorMessage = '';
 
-      const { username, email, password } = this.registerForm.value;
-      const registerData: RegisterRequestDto = { username, email, password };
+      const { username, email, password, confirmedPassword } = this.registerForm.value;
+      const registerData: RegisterRequestDto = { 
+        username, 
+        email, 
+        password,
+        confirmPassword: confirmedPassword 
+      };
 
       this.authService.register(registerData).subscribe({
         next: (response) => {

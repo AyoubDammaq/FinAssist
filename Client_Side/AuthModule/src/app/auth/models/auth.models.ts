@@ -3,6 +3,7 @@ export interface RegisterRequestDto {
   username: string;
   email: string;
   password: string;
+  confirmPassword: string;
 }
 
 export interface LoginRequestDto {
@@ -60,6 +61,12 @@ export interface ApiResponse<T = any> {
   data?: T;
   message?: string;
   success: boolean;
+}
+
+export interface ApiError {
+  Message: string;
+  ErrorCode: string;
+  Details?: any;
 }
 
 export interface ErrorResponse {
