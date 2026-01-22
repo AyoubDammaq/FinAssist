@@ -1,4 +1,5 @@
 ﻿using AuthService.Application.DTOs;
+using AuthService.Application.Exceptions;
 using AuthService.Application.Utils;
 using AuthService.Domain.Entities;
 using AuthService.Domain.Interfaces;
@@ -25,7 +26,7 @@ namespace AuthService.Application.Commands.Register
             var isStrong = await _passwordManagement.IsPasswordStrong(request.registerRequestDto.Password);
             if (!isStrong)
             {
-                throw new ArgumentException("Le mot de passe n'est pas assez fort.");
+                throw new WeakPasswordException();
             }
 
             try
@@ -36,6 +37,14 @@ namespace AuthService.Application.Commands.Register
                 await _userRepository.Register(user);
                 var responseDto = _mapper.Map<RegisterResponseDto>(user);
                 return responseDto;
+            }
+            catch (WeakPasswordException)
+            {
+                throw; 
+            }
+            catch (ApplicationException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
