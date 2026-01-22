@@ -2,7 +2,6 @@
 using AuthService.Domain.Entities;
 using AuthService.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Runtime.CompilerServices;
 
 namespace AuthService.Infrastructure.Repositories
 {

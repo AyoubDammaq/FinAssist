@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AuthService.Domain.Common
+﻿namespace AuthService.Domain.Common
 {
     public class BaseEntity
     {

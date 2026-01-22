@@ -53,7 +53,6 @@ namespace AuthService.Application.Commands.ResetPassword
             var hashResult = await _passwordManagement.HashPassword(dto.NewPassword);
             user.PasswordHash = hashResult.Hash;
 
-            // Invalider le token après usage
             user.ResetToken = null;
             user.ResetTokenExpiryTime = null;
             user.UpdatedAt = DateTime.UtcNow;

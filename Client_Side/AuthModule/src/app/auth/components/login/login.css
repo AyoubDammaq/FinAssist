@@ -1,0 +1,155 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.login-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.login-card h2 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  text-align: center;
+}
+
+.subtitle {
+  margin: 0 0 32px 0;
+  color: #666;
+  text-align: center;
+  font-size: 14px;
+}
+
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.alert-error {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group input.invalid {
+  border-color: #f44336;
+}
+
+.error-message {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #f44336;
+}
+
+.form-actions {
+  margin-top: 32px;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  /* overlay sombre minimal (alpha = 0.15) + gradient original */
+  background-image:
+    linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)),
+    linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-blend-mode: normal;
+  color: #ffffff; /* blanc sûr après overlay (WCAG ≥ 4.5) */
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  display: inline-block;
+  text-align: center;
+}
+
+/* hover / focus : augmenter légèrement l'overlay et ajouter un focus ring */
+.btn-primary:hover:not(:disabled),
+.btn-primary:focus:not(:disabled) {
+  transform: translateY(-2px);
+  background-image:
+    linear-gradient(rgba(0,0,0,0.20), rgba(0,0,0,0.20)),
+    linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  outline: none;
+  /* accessible focus ring */
+  box-shadow: 0 6px 20px rgba(102,126,234,0.28), 0 0 0 4px rgba(118,75,162,0.12);
+}
+
+/* état disabled : ne pas utiliser opacity globale (affecte le texte),
+   au lieu de ça, remplacer background et cursor pour garder le texte lisible */
+.btn-primary:disabled {
+  cursor: not-allowed;
+  /* fond désactivé plus doux tout en gardant le texte accessible */
+  background-image:
+    linear-gradient(rgba(0,0,0,0.10), rgba(0,0,0,0.10)),
+    linear-gradient(135deg, #aab8ff 0%, #b9a6d6 100%);
+  color: #ffffff; /* garder couleur de texte contrastée */
+  box-shadow: none;
+  transform: none;
+}
+
+.form-footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+}
+
+.form-footer .link {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.form-footer .link:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+.separator {
+  margin: 0 10px;
+  color: #ccc;
+}

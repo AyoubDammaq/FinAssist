@@ -3,7 +3,6 @@ using AuthService.Application.DTOs;
 using AuthService.Application.Utils;
 using AuthService.Domain.Entities;
 using AuthService.Domain.Interfaces;
-using AuthService.UnitTests.TestUtils;
 using FluentAssertions;
 using Moq;
 
