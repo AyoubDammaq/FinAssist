@@ -42,8 +42,7 @@ namespace AuthService.Application.Mapping
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
-                .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
-                .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.PasswordHash));
+                .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName));
 
             CreateMap<RegisterRequestDto, User>(MemberList.None)
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))

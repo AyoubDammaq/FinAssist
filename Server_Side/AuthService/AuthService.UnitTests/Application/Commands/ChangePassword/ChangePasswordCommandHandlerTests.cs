@@ -20,9 +20,9 @@ public sealed class ChangePasswordCommandHandlerTests
         var sut = new ChangePasswordCommandHandler(repo.Object, password.Object);
 
         var cmd = new ChangePasswordCommand(
-            Guid.NewGuid(),
             new ChangePasswordRequestDto
             {
+                UserId = Guid.NewGuid(),
                 CurrentPassword = "",
                 NewPassword = "New#12345",
                 ConfirmNewPassword = "New#12345"
@@ -43,9 +43,9 @@ public sealed class ChangePasswordCommandHandlerTests
         var sut = new ChangePasswordCommandHandler(repo.Object, password.Object);
 
         var cmd = new ChangePasswordCommand(
-            Guid.NewGuid(),
             new ChangePasswordRequestDto
             {
+                UserId = Guid.NewGuid(),
                 CurrentPassword = "Old#12345",
                 NewPassword = "New#12345",
                 ConfirmNewPassword = "Different#12345"
@@ -71,9 +71,9 @@ public sealed class ChangePasswordCommandHandlerTests
         var sut = new ChangePasswordCommandHandler(repo.Object, password.Object);
 
         var cmd = new ChangePasswordCommand(
-            userId,
             new ChangePasswordRequestDto
             {
+                UserId = userId,
                 CurrentPassword = "Old#12345",
                 NewPassword = "New#12345",
                 ConfirmNewPassword = "New#12345"
@@ -103,9 +103,9 @@ public sealed class ChangePasswordCommandHandlerTests
         var sut = new ChangePasswordCommandHandler(repo.Object, password.Object);
 
         var cmd = new ChangePasswordCommand(
-            userId,
             new ChangePasswordRequestDto
             {
+                UserId = userId,
                 CurrentPassword = "bad",
                 NewPassword = "New#12345",
                 ConfirmNewPassword = "New#12345"
@@ -145,9 +145,9 @@ public sealed class ChangePasswordCommandHandlerTests
         var sut = new ChangePasswordCommandHandler(repo.Object, password.Object);
 
         var cmd = new ChangePasswordCommand(
-            userId,
             new ChangePasswordRequestDto
             {
+                UserId = userId,
                 CurrentPassword = "Old#12345",
                 NewPassword = "New#12345",
                 ConfirmNewPassword = "New#12345"

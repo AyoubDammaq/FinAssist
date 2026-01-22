@@ -16,10 +16,8 @@ namespace AuthService.Application.DTOs
         [StringLength(100)]
         public string? LastName { get; set; }
 
-        [Phone]
         [StringLength(20)]
+        [RegularExpression(@"^\s*$|^\+?[0-9\s\-\(\)\.]{7,20}$", ErrorMessage = "The PhoneNumber field is not a valid phone number.")]
         public string? PhoneNumber { get; set; }
-
-        public string PasswordHash { get; set; } = null!;
     }
 }

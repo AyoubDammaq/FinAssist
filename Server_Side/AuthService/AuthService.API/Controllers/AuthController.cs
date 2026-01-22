@@ -167,7 +167,7 @@ namespace AuthService.API.Controllers
                     ));
                 }
 
-                await _mediator.Send(new ChangePasswordCommand(userId, dto), cancellationToken);
+                await _mediator.Send(new ChangePasswordCommand(dto), cancellationToken);
 
                 return Ok(new { message = "Mot de passe mis à jour avec succès." });
             });

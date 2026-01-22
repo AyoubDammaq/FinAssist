@@ -1,6 +1,6 @@
 ﻿using AuthService.Application.DTOs;
-using AuthService.Domain.Interfaces;
 using AuthService.Application.Utils;
+using AuthService.Domain.Interfaces;
 using AutoMapper;
 using MediatR;
 
@@ -8,7 +8,7 @@ namespace AuthService.Application.Commands.Login
 {
     public class LoginCommandHandler(IUserRepository userRepository, IPasswordManagement passwordManagement, ITokenManagement tokenManagement, IMapper mapper) : IRequestHandler<LoginCommand, LoginResponseDto>
     {
-        public readonly IUserRepository _userRepository = userRepository;   
+        public readonly IUserRepository _userRepository = userRepository;
         public readonly IPasswordManagement _passwordManagement = passwordManagement;
         public readonly ITokenManagement _tokenManagement = tokenManagement;
         public readonly IMapper _mapper = mapper;
@@ -23,11 +23,24 @@ namespace AuthService.Application.Commands.Login
                 {
                     throw new UnauthorizedAccessException("Nom d'utilisateur ou mot de passe incorrect.");
                 }
-                var token = await _tokenManagement.GenerateToken(user);
+
+                var accessToken = await _tokenManagement.GenerateToken(user);
                 var refreshToken = await _tokenManagement.GenerateRefreshToken();
+
+                // Persistance du refresh token en base (GetByEmail() est AsNoTracking())
+                var userTracked = await _userRepository.GetById(user.Id);
+                if (userTracked is null)
+                {
+                    throw new KeyNotFoundException("Utilisateur introuvable.");
+                }
+
+                userTracked.RefreshToken = refreshToken;
+                userTracked.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // à ajuster selon ta politique
+                await _userRepository.Update(userTracked);
+
                 return new LoginResponseDto
                 {
-                    AccessToken = token,
+                    AccessToken = accessToken,
                     RefreshToken = refreshToken
                 };
             }

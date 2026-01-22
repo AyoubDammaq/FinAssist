@@ -28,8 +28,7 @@ public sealed class UpdateProfileCommandHandlerTests
             UserName = "new",
             FirstName = "First",
             LastName = "Last",
-            PhoneNumber = "0600000000",
-            PasswordHash = "ignored"
+            PhoneNumber = "0600000000"
         });
 
         var act = () => sut.Handle(cmd, CancellationToken.None);
@@ -51,8 +50,7 @@ public sealed class UpdateProfileCommandHandlerTests
             UserName = "old",
             FirstName = "Old",
             LastName = "Name",
-            PhoneNumber = "0700000000",
-            PasswordHash = "hash"
+            PhoneNumber = "0700000000"
         };
 
         var repo = new Mock<IUserRepository>(MockBehavior.Strict);
@@ -68,8 +66,7 @@ public sealed class UpdateProfileCommandHandlerTests
             UserName = "new",
             FirstName = "First",
             LastName = "Last",
-            PhoneNumber = "0600000000",
-            PasswordHash = "hash.should.not.matter"
+            PhoneNumber = "0600000000"
         });
 
         var result = await sut.Handle(cmd, CancellationToken.None);

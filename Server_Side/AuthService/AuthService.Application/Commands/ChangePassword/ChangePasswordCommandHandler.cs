@@ -34,7 +34,7 @@ namespace AuthService.Application.Commands.ChangePassword
                 throw new ArgumentException("Le mot de passe n'est pas assez fort.");
             }
 
-            var user = await _userRepository.GetById(request.UserId);
+            var user = await _userRepository.GetById(request.ChangePasswordRequestDto.UserId);
             if (user == null)
             {
                 throw new KeyNotFoundException("Utilisateur introuvable.");

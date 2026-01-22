@@ -5,6 +5,9 @@ namespace AuthService.Application.DTOs
     public sealed class ChangePasswordRequestDto
     {
         [Required]
+        public Guid UserId { get; set; }    
+
+        [Required]
         [StringLength(256, MinimumLength = 6)]
         public string CurrentPassword { get; set; } = null!;
 

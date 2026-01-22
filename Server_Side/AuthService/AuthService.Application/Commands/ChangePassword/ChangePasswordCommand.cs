@@ -3,5 +3,5 @@ using MediatR;
 
 namespace AuthService.Application.Commands.ChangePassword
 {
-    public sealed record ChangePasswordCommand(Guid UserId, ChangePasswordRequestDto ChangePasswordRequestDto) : IRequest<Unit>;
+    public sealed record ChangePasswordCommand(ChangePasswordRequestDto ChangePasswordRequestDto) : IRequest<Unit>;
 }

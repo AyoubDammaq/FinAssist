@@ -6,7 +6,7 @@ namespace AuthService.Application.Commands.ChangePassword
     {
         public ChangePasswordCommandValidator()
         {
-            RuleFor(x => x.UserId)
+            RuleFor(x => x.ChangePasswordRequestDto.UserId)
                 .NotEmpty();
 
             RuleFor(x => x.ChangePasswordRequestDto)
