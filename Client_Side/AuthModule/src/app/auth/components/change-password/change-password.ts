@@ -39,9 +39,9 @@ export class ChangePassword {
 
     this.changePasswordForm = this.fb.group(
       {
-        oldPassword: ['', [Validators.required]],
+        currentPassword: ['', [Validators.required]],
         newPassword: ['', [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ['', [Validators.required]],
+        confirmNewPassword: ['', [Validators.required]],
       },
       { validators: this.passwordMatchValidator },
     );
@@ -49,13 +49,13 @@ export class ChangePassword {
 
   passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
     const newPassword = control.get('newPassword');
-    const confirmPassword = control.get('confirmPassword');
+    const confirmNewPassword = control.get('confirmNewPassword');
 
-    if (!newPassword || !confirmPassword) {
+    if (!newPassword || !confirmNewPassword) {
       return null;
     }
 
-    return newPassword.value === confirmPassword.value ? null : { passwordMismatch: true };
+    return newPassword.value === confirmNewPassword.value ? null : { passwordMismatch: true };
   }
 
   onSubmit() {
@@ -64,10 +64,20 @@ export class ChangePassword {
       this.errorMessage = '';
       this.successMessage = '';
 
-      const { oldPassword, newPassword } = this.changePasswordForm.value;
+      // Get user ID from token or current user
+      const userId = this.authService.getUserIdFromToken();
+      if (!userId) {
+        this.errorMessage = 'Utilisateur non authentifié';
+        this.isSubmitting = false;
+        return;
+      }
+
+      const { currentPassword, newPassword, confirmNewPassword } = this.changePasswordForm.value;
       const changePasswordData: ChangePasswordRequestDto = {
-        oldPassword,
+        userId,
+        currentPassword,
         newPassword,
+        confirmNewPassword,
       };
 
       this.authService.changePassword(changePasswordData).subscribe({
@@ -109,15 +119,15 @@ export class ChangePassword {
     }
   }
 
-  get oldPassword() {
-    return this.changePasswordForm.get('oldPassword');
+  get currentPassword() {
+    return this.changePasswordForm.get('currentPassword');
   }
 
   get newPassword() {
     return this.changePasswordForm.get('newPassword');
   }
 
-  get confirmPassword() {
-    return this.changePasswordForm.get('confirmPassword');
+  get confirmNewPassword() {
+    return this.changePasswordForm.get('confirmNewPassword');
   }
 }

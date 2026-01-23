@@ -203,7 +203,14 @@ export class AuthService {
     try {
       // Décoder le payload JWT (la partie entre les deux points)
       const payload = token.split('.')[1];
-      const decodedPayload = JSON.parse(atob(payload));
+      
+      // Convertir base64url en base64 standard et ajouter le padding si nécessaire
+      let base64 = payload.replaceAll('-', '+').replaceAll('_', '/');
+      while (base64.length % 4) {
+        base64 += '=';
+      }
+      
+      const decodedPayload = JSON.parse(atob(base64));
       
       console.log('🔍 Decoded JWT payload:', decodedPayload);
       
@@ -237,7 +244,14 @@ export class AuthService {
 
     try {
       const payload = token.split('.')[1];
-      const decodedPayload = JSON.parse(atob(payload));
+      
+      // Convertir base64url en base64 standard et ajouter le padding si nécessaire
+      let base64 = payload.replaceAll('-', '+').replaceAll('_', '/');
+      while (base64.length % 4) {
+        base64 += '=';
+      }
+      
+      const decodedPayload = JSON.parse(atob(base64));
       
       // Extraire les informations courantes
       const userId = 

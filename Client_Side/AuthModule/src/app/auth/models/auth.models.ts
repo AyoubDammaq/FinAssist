@@ -16,8 +16,10 @@ export interface RefreshTokenRequestDto {
 }
 
 export interface ChangePasswordRequestDto {
-  oldPassword: string;
+  userId: string;
+  currentPassword: string;
   newPassword: string;
+  confirmNewPassword: string;
 }
 
 export interface ForgotPasswordRequestDto {
