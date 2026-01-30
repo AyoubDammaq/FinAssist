@@ -1,6 +1,5 @@
 ﻿using AuthService.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using System.Security.Cryptography;
 
 namespace AuthService.Application.Utils
 {
@@ -25,12 +24,10 @@ namespace AuthService.Application.Utils
         {
             try
             {
-                using (var hmac = new HMACSHA512())
-                {
-                    var salt = hmac.Key;
-                    var hash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                    return Task.FromResult((Convert.ToBase64String(hash), Convert.ToBase64String(salt)));
-                }
+                var passwordHasher = new PasswordHasher<User>();
+                var hash = passwordHasher.HashPassword(user: null!, password);
+
+                return Task.FromResult((hash, string.Empty));
             }
             catch (Exception ex)
             {

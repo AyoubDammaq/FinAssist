@@ -16,8 +16,9 @@ public sealed class ForgotPasswordCommandHandlerTests
     {
         var repo = new Mock<IUserRepository>(MockBehavior.Strict);
         var token = new Mock<ITokenManagement>(MockBehavior.Strict);
+        var email = new Mock<IEmailManagment>(MockBehavior.Strict);
 
-        var sut = new ForgotPasswordCommandHandler(repo.Object, token.Object);
+        var sut = new ForgotPasswordCommandHandler(repo.Object, token.Object, email.Object);
         var cmd = new ForgotPasswordCommand(new ForgotPasswordRequestDto { Email = " " });
 
         var act = () => sut.Handle(cmd, CancellationToken.None);
@@ -27,44 +28,54 @@ public sealed class ForgotPasswordCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_UserNotFound_ReturnsUnit_AndDoesNotUpdate()
+    public async Task Handle_UserNotFound_ReturnsUnit_AndDoesNotUpdate_AndDoesNotSendEmail()
     {
         var repo = new Mock<IUserRepository>(MockBehavior.Strict);
-        repo.Setup(r => r.GetByEmail("a@b.com")).ReturnsAsync((User?)null);
+        repo.Setup(r => r.GetByEmail("finassistservice267@gmail.com")).ReturnsAsync((User?)null);
 
         var token = new Mock<ITokenManagement>(MockBehavior.Strict);
+        var email = new Mock<IEmailManagment>(MockBehavior.Strict);
+        email.Setup(e => e.CheckEmailValidation("finassistservice267@gmail.com", It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
-        var sut = new ForgotPasswordCommandHandler(repo.Object, token.Object);
-        var cmd = new ForgotPasswordCommand(new ForgotPasswordRequestDto { Email = "a@b.com" });
+        var sut = new ForgotPasswordCommandHandler(repo.Object, token.Object    , email.Object);
+        var cmd = new ForgotPasswordCommand(new ForgotPasswordRequestDto { Email = "finassistservice267@gmail.com" });
 
         var result = await sut.Handle(cmd, CancellationToken.None);
 
         result.Should().Be(Unit.Value);
 
         repo.Verify(r => r.Update(It.IsAny<User>()), Times.Never);
+        email.Verify(e => e.SendPasswordResetEmailAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+
         repo.VerifyAll();
+        token.VerifyAll();
+        email.VerifyAll();
     }
 
     [Fact]
-    public async Task Handle_UserFound_SetsResetToken_AndUpdatesUser()
+    public async Task Handle_UserFound_SetsResetToken_AndUpdatesUser_AndSendsEmail()
     {
         var user = new User
         {
             Id = Guid.NewGuid(),
-            Email = "a@b.com",
+            Email = "ayoubdammak81@gmail.com",
             UserName = "user",
             PasswordHash = "hash"
         };
 
         var repo = new Mock<IUserRepository>(MockBehavior.Strict);
-        repo.Setup(r => r.GetByEmail("a@b.com")).ReturnsAsync(user);
+        repo.Setup(r => r.GetByEmail("ayoubdammak81@gmail.com")).ReturnsAsync(user);
         repo.Setup(r => r.Update(It.IsAny<User>())).Returns(Task.CompletedTask);
 
         var token = new Mock<ITokenManagement>(MockBehavior.Strict);
         token.Setup(t => t.GenerateResetToken()).ReturnsAsync("reset.token");
 
-        var sut = new ForgotPasswordCommandHandler(repo.Object, token.Object);
-        var cmd = new ForgotPasswordCommand(new ForgotPasswordRequestDto { Email = "a@b.com" });
+        var email = new Mock<IEmailManagment>(MockBehavior.Strict);
+        email.Setup(e => e.CheckEmailValidation("ayoubdammak81@gmail.com", It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        email.Setup(e => e.SendPasswordResetEmailAsync("ayoubdammak81@gmail.com", "reset.token")).ReturnsAsync(true);
+
+        var sut = new ForgotPasswordCommandHandler(repo.Object, token.Object, email.Object);
+        var cmd = new ForgotPasswordCommand(new ForgotPasswordRequestDto { Email = "ayoubdammak81@gmail.com" });
 
         var result = await sut.Handle(cmd, CancellationToken.None);
 
@@ -77,7 +88,10 @@ public sealed class ForgotPasswordCommandHandlerTests
             u.UpdatedAt > DateTime.UtcNow.AddMinutes(-1)
         )), Times.Once);
 
+        email.Verify(e => e.SendPasswordResetEmailAsync("ayoubdammak81@gmail.com", "reset.token"), Times.Once);
+
         repo.VerifyAll();
         token.VerifyAll();
+        email.VerifyAll();
     }
 }

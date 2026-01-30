@@ -1,4 +1,5 @@
-﻿using AuthService.Application.Utils;
+﻿using AuthService.Application.Services;
+using AuthService.Application.Utils;
 using AuthService.Domain.Interfaces;
 using AuthService.Infrastructure.Data;
 using AuthService.Infrastructure.Repositories;
@@ -22,6 +23,7 @@ namespace AuthService.Infrastructure.Extensions
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPasswordManagement, PasswordManagement>();
             services.AddScoped<ITokenManagement, TokenManagement>();
+            services.AddScoped<IEmailManagment, EmailManagment>();  
 
             services.AddAuthentication(options =>
             {

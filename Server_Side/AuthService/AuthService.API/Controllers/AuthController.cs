@@ -14,6 +14,7 @@ using AuthService.Application.Queries.GetUserByEmail;
 using AuthService.Application.Queries.GetUserById;
 using AuthService.Application.Queries.GetUserByUsername;
 using AuthService.Application.Queries.Health;
+using AuthService.Application.Utils;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,10 +28,11 @@ namespace AuthService.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IMediator _mediator;
-
-        public AuthController(IMediator mediator)
+        private readonly IEmailManagment _emailManagment;
+        public AuthController(IMediator mediator, IEmailManagment emailManagment)
         {
             _mediator = mediator;
+            _emailManagment = emailManagment;
         }
 
         private sealed record ApiError(string Message, string ErrorCode, object? Details = null);
@@ -306,6 +308,36 @@ namespace AuthService.API.Controllers
                 var query = new HealthCommand();
                 var result = await _mediator.Send(query);
                 return Ok(result);
+            });
+
+
+        [HttpPost("validate-email")]
+        [AllowAnonymous]
+        [Consumes("application/json")]
+        [ProducesResponseType(typeof(ValidateEmailResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
+        public Task<IActionResult> ValidateEmail([FromBody] ValidateEmailRequestDto dto, CancellationToken cancellationToken)
+            => ExecuteAsync(async () =>
+            {
+                if (dto is null || string.IsNullOrWhiteSpace(dto.Email))
+                {
+                    return BadRequest(new ApiError(
+                        Message: "Email requis.",
+                        ErrorCode: "EMAIL_REQUIRED"
+                    ));
+                }
+
+                var email = dto.Email.Trim();
+                var isValid = await _emailManagment.CheckEmailValidation(email, cancellationToken);
+
+                var response = new ValidateEmailResponseDto
+                {
+                    Email = email,
+                    IsValid = isValid
+                };
+
+                return Ok(response);
             });
     }
 }
