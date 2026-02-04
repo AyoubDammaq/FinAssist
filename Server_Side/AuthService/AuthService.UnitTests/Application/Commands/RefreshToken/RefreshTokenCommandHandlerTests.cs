@@ -4,6 +4,7 @@ using AuthService.Application.Utils;
 using AuthService.Domain.Entities;
 using AuthService.Domain.Interfaces;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace AuthService.UnitTests.Application.Commands.RefreshToken;
@@ -15,8 +16,9 @@ public sealed class RefreshTokenCommandHandlerTests
     {
         var repo = new Mock<IUserRepository>(MockBehavior.Strict);
         var token = new Mock<ITokenManagement>(MockBehavior.Strict);
+        var logger = new Mock<ILogger<RefreshTokenCommandHandler>>(MockBehavior.Loose);
 
-        var sut = new RefreshTokenCommandHandler(repo.Object, token.Object);
+        var sut = new RefreshTokenCommandHandler(repo.Object, token.Object, logger.Object);
         var cmd = new RefreshTokenCommand(new RefreshTokenRequestDto { Id = Guid.NewGuid(), RefreshToken = " " });
 
         var act = () => sut.Handle(cmd, CancellationToken.None);
@@ -35,7 +37,9 @@ public sealed class RefreshTokenCommandHandlerTests
 
         var token = new Mock<ITokenManagement>(MockBehavior.Strict);
 
-        var sut = new RefreshTokenCommandHandler(repo.Object, token.Object);
+        var logger = new Mock<ILogger<RefreshTokenCommandHandler>>(MockBehavior.Loose);
+
+        var sut = new RefreshTokenCommandHandler(repo.Object, token.Object, logger.Object);
         var cmd = new RefreshTokenCommand(new RefreshTokenRequestDto { Id = userId, RefreshToken = "rt" });
 
         var act = () => sut.Handle(cmd, CancellationToken.None);
@@ -64,7 +68,9 @@ public sealed class RefreshTokenCommandHandlerTests
 
         var token = new Mock<ITokenManagement>(MockBehavior.Strict);
 
-        var sut = new RefreshTokenCommandHandler(repo.Object, token.Object);
+        var logger = new Mock<ILogger<RefreshTokenCommandHandler>>(MockBehavior.Loose);
+
+        var sut = new RefreshTokenCommandHandler(repo.Object, token.Object, logger.Object);
         var cmd = new RefreshTokenCommand(new RefreshTokenRequestDto { Id = userId, RefreshToken = "rt" });
 
         var act = () => sut.Handle(cmd, CancellationToken.None);
@@ -85,7 +91,7 @@ public sealed class RefreshTokenCommandHandlerTests
             Email = "a@b.com",
             UserName = "user",
             PasswordHash = "hash",
-            RefreshToken = "old",
+            RefreshTokenHash = "old",
             RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(1),
             UpdatedAt = DateTime.UtcNow.AddDays(-1)
         };
@@ -98,7 +104,9 @@ public sealed class RefreshTokenCommandHandlerTests
         token.Setup(t => t.GenerateToken(user)).ReturnsAsync("access.new");
         token.Setup(t => t.GenerateRefreshToken()).ReturnsAsync("refresh.new");
 
-        var sut = new RefreshTokenCommandHandler(repo.Object, token.Object);
+        var logger = new Mock<ILogger<RefreshTokenCommandHandler>>();
+
+        var sut = new RefreshTokenCommandHandler(repo.Object, token.Object, logger.Object);
         var cmd = new RefreshTokenCommand(new RefreshTokenRequestDto { Id = userId, RefreshToken = "rt" });
 
         var result = await sut.Handle(cmd, CancellationToken.None);
@@ -108,7 +116,7 @@ public sealed class RefreshTokenCommandHandlerTests
 
         repo.Verify(r => r.Update(It.Is<User>(u =>
             u.Id == userId &&
-            u.RefreshToken == "refresh.new" &&
+            u.RefreshTokenHash == "refresh.new" &&
             u.RefreshTokenExpiryTime.HasValue &&
             u.RefreshTokenExpiryTime.Value > DateTime.UtcNow.AddDays(6) // ~7 jours
         )), Times.Once);

@@ -11,4 +11,6 @@ public interface ITokenManagement
     ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
     bool ValidateToken(string token);
     string? GetUserIdFromToken(string token);
+    string HashToken(string token);
+    bool VerifyHashedToken(string token, string storedBase64Hash);
 }

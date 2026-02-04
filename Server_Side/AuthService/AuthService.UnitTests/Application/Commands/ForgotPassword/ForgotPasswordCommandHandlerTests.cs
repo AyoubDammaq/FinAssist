@@ -5,6 +5,7 @@ using AuthService.Domain.Entities;
 using AuthService.Domain.Interfaces;
 using FluentAssertions;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace AuthService.UnitTests.Application.Commands.ForgotPassword;
@@ -17,8 +18,9 @@ public sealed class ForgotPasswordCommandHandlerTests
         var repo = new Mock<IUserRepository>(MockBehavior.Strict);
         var token = new Mock<ITokenManagement>(MockBehavior.Strict);
         var email = new Mock<IEmailManagment>(MockBehavior.Strict);
+        var logger = new Mock<ILogger<ForgotPasswordCommandHandler>>();
 
-        var sut = new ForgotPasswordCommandHandler(repo.Object, token.Object, email.Object);
+        var sut = new ForgotPasswordCommandHandler(repo.Object, token.Object, email.Object, logger.Object);
         var cmd = new ForgotPasswordCommand(new ForgotPasswordRequestDto { Email = " " });
 
         var act = () => sut.Handle(cmd, CancellationToken.None);
@@ -35,9 +37,11 @@ public sealed class ForgotPasswordCommandHandlerTests
 
         var token = new Mock<ITokenManagement>(MockBehavior.Strict);
         var email = new Mock<IEmailManagment>(MockBehavior.Strict);
+        var logger = new Mock<ILogger<ForgotPasswordCommandHandler>>();
+
         email.Setup(e => e.CheckEmailValidation("finassistservice267@gmail.com", It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
-        var sut = new ForgotPasswordCommandHandler(repo.Object, token.Object    , email.Object);
+        var sut = new ForgotPasswordCommandHandler(repo.Object, token.Object, email.Object, logger.Object);
         var cmd = new ForgotPasswordCommand(new ForgotPasswordRequestDto { Email = "finassistservice267@gmail.com" });
 
         var result = await sut.Handle(cmd, CancellationToken.None);
@@ -69,12 +73,15 @@ public sealed class ForgotPasswordCommandHandlerTests
 
         var token = new Mock<ITokenManagement>(MockBehavior.Strict);
         token.Setup(t => t.GenerateResetToken()).ReturnsAsync("reset.token");
+        token.Setup(t => t.HashToken("reset.token")).Returns("reset.token");
 
         var email = new Mock<IEmailManagment>(MockBehavior.Strict);
         email.Setup(e => e.CheckEmailValidation("ayoubdammak81@gmail.com", It.IsAny<CancellationToken>())).ReturnsAsync(true);
         email.Setup(e => e.SendPasswordResetEmailAsync("ayoubdammak81@gmail.com", "reset.token")).ReturnsAsync(true);
 
-        var sut = new ForgotPasswordCommandHandler(repo.Object, token.Object, email.Object);
+        var logger = new Mock<ILogger<ForgotPasswordCommandHandler>>();
+
+        var sut = new ForgotPasswordCommandHandler(repo.Object, token.Object, email.Object, logger.Object);
         var cmd = new ForgotPasswordCommand(new ForgotPasswordRequestDto { Email = "ayoubdammak81@gmail.com" });
 
         var result = await sut.Handle(cmd, CancellationToken.None);
@@ -82,7 +89,7 @@ public sealed class ForgotPasswordCommandHandlerTests
         result.Should().Be(Unit.Value);
 
         repo.Verify(r => r.Update(It.Is<User>(u =>
-            u.ResetToken == "reset.token" &&
+            u.ResetTokenHash == "reset.token" &&
             u.ResetTokenExpiryTime.HasValue &&
             u.ResetTokenExpiryTime.Value > DateTime.UtcNow.AddMinutes(14) &&
             u.UpdatedAt > DateTime.UtcNow.AddMinutes(-1)

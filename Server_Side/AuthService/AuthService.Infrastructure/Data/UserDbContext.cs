@@ -100,14 +100,14 @@ public partial class UserDbContext : DbContext
                 .HasColumnType("timestamp with time zone");
 
             // ===== Tokens de rafraîchissement =====
-            entity.Property(e => e.RefreshToken)
+            entity.Property(e => e.RefreshTokenHash)
                 .HasMaxLength(500);
 
             entity.Property(e => e.RefreshTokenExpiryTime)
                 .HasColumnType("timestamp with time zone");
 
             // ===== Tokens de réinitialisation =====
-            entity.Property(e => e.ResetToken)
+            entity.Property(e => e.ResetTokenHash)
                 .HasMaxLength(500);
 
             entity.Property(e => e.ResetTokenExpiryTime)

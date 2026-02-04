@@ -3,6 +3,7 @@ using AuthService.Domain.Entities;
 using AuthService.Domain.Interfaces;
 using AuthService.UnitTests.TestUtils;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace AuthService.UnitTests.Application.Commands.DeleteUser;
@@ -17,8 +18,9 @@ public sealed class DeleteUserCommandHandlerTests
         var repo = new Mock<IUserRepository>(MockBehavior.Strict);
         repo.Setup(r => r.GetById(userId)).ReturnsAsync((User?)null);
 
-        var mapper = MapperFactory.Create();
-        var sut = new DeleteUserCommandHandler(repo.Object, mapper);
+        var logger = new Mock<ILogger<DeleteUserCommandHandler>>();
+
+        var sut = new DeleteUserCommandHandler(repo.Object, logger.Object);
 
         var cmd = new DeleteUserCommand(userId);
 
@@ -40,8 +42,8 @@ public sealed class DeleteUserCommandHandlerTests
         repo.Setup(r => r.GetById(userId)).ReturnsAsync(user);
         repo.Setup(r => r.Delete(user)).Returns(Task.CompletedTask);
 
-        var mapper = MapperFactory.Create();
-        var sut = new DeleteUserCommandHandler(repo.Object, mapper);
+        var logger = new Mock<ILogger<DeleteUserCommandHandler>>();
+        var sut = new DeleteUserCommandHandler(repo.Object, logger.Object);
 
         var cmd = new DeleteUserCommand(userId);
 

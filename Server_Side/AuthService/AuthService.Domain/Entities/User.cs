@@ -40,12 +40,12 @@ public partial class User : BaseEntity
     public DateTime? LockoutEnd { get; set; }
 
     [StringLength(500)]
-    public string? RefreshToken { get; set; }
+    public string? RefreshTokenHash { get; set; }
 
     public DateTime? RefreshTokenExpiryTime { get; set; }
 
     [StringLength(500)]
-    public string? ResetToken { get; set; }
+    public string? ResetTokenHash { get; set; }
 
     public DateTime? ResetTokenExpiryTime { get; set; }
 }

@@ -5,6 +5,7 @@ using AuthService.Domain.Interfaces;
 using AuthService.UnitTests.TestUtils;
 using FluentAssertions;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace AuthService.UnitTests.Application.Commands.UpdateProfile;
@@ -20,7 +21,9 @@ public sealed class UpdateProfileCommandHandlerTests
         repo.Setup(r => r.GetById(userId)).ReturnsAsync((User?)null);
 
         var mapper = MapperFactory.Create();
-        var sut = new UpdateProfileCommandHandler(repo.Object, mapper);
+        var logger = new Mock<ILogger<UpdateProfileCommandHandler>>(MockBehavior.Loose);
+
+        var sut = new UpdateProfileCommandHandler(repo.Object, mapper, logger.Object);
 
         var cmd = new UpdateProfileCommand(new UpdateProfileDto
         {
@@ -58,7 +61,9 @@ public sealed class UpdateProfileCommandHandlerTests
         repo.Setup(r => r.Update(It.IsAny<User>())).Returns(Task.CompletedTask);
 
         var mapper = MapperFactory.Create();
-        var sut = new UpdateProfileCommandHandler(repo.Object, mapper);
+        var logger = new Mock<ILogger<UpdateProfileCommandHandler>>(MockBehavior.Loose);
+
+        var sut = new UpdateProfileCommandHandler(repo.Object, mapper, logger.Object);
 
         var cmd = new UpdateProfileCommand(new UpdateProfileDto
         {

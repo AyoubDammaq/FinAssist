@@ -3,6 +3,7 @@ using AuthService.Domain.Entities;
 using AuthService.Domain.Interfaces;
 using FluentAssertions;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace AuthService.UnitTests.Application.Commands.Logout;
@@ -20,7 +21,9 @@ public sealed class LogoutCommandHandlerTests
         // Setup must match handler (GetByEmail)
         repo.Setup(r => r.GetByEmail(userEmail)).ReturnsAsync((User?)null);
 
-        var sut = new LogoutCommandHandler(repo.Object);
+        var logger = new Mock<ILogger<LogoutCommandHandler>>(MockBehavior.Loose);   
+
+        var sut = new LogoutCommandHandler(repo.Object, logger.Object);
         var cmd = new LogoutCommand(userEmail);
 
         // Act
@@ -44,7 +47,7 @@ public sealed class LogoutCommandHandlerTests
             Email = userEmail,
             UserName = "user",
             PasswordHash = "hash",
-            RefreshToken = "refresh.old",
+            RefreshTokenHash = "refresh.old",
             RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(1)
         };
 
@@ -53,7 +56,9 @@ public sealed class LogoutCommandHandlerTests
         repo.Setup(r => r.GetByEmail(userEmail)).ReturnsAsync(userFromDb);
         repo.Setup(r => r.Update(It.IsAny<User>())).Returns(Task.CompletedTask);
 
-        var sut = new LogoutCommandHandler(repo.Object);
+        var logger = new Mock<ILogger<LogoutCommandHandler>>(MockBehavior.Loose);
+
+        var sut = new LogoutCommandHandler(repo.Object, logger.Object);
         var cmd = new LogoutCommand(userEmail);
 
         // Act
@@ -64,7 +69,7 @@ public sealed class LogoutCommandHandlerTests
 
         repo.Verify(r => r.Update(It.Is<User>(u =>
             u.Id == userId &&
-            u.RefreshToken == null &&
+            u.RefreshTokenHash == null &&
             u.RefreshTokenExpiryTime == null
         )), Times.Once);
 

@@ -5,6 +5,7 @@ using AuthService.Domain.Entities;
 using AuthService.Domain.Interfaces;
 using AuthService.UnitTests.TestUtils;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace AuthService.UnitTests.Application.Commands.Login;
@@ -23,7 +24,9 @@ public sealed class LoginCommandHandlerTests
         var token = new Mock<ITokenManagement>(MockBehavior.Strict);
         var mapper = MapperFactory.Create();
 
-        var sut = new LoginCommandHandler(repo.Object, password.Object, token.Object, mapper);
+        var logger = new Mock<ILogger<LoginCommandHandler>>(MockBehavior.Loose);
+
+        var sut = new LoginCommandHandler(repo.Object, password.Object, token.Object, mapper, logger.Object);
         var cmd = new LoginCommand(new LoginRequestDto { Email = "a@b.com", Password = "Secret#123" });
 
         // Act
@@ -49,7 +52,9 @@ public sealed class LoginCommandHandlerTests
         var token = new Mock<ITokenManagement>(MockBehavior.Strict);
         var mapper = MapperFactory.Create();
 
-        var sut = new LoginCommandHandler(repo.Object, password.Object, token.Object, mapper);
+        var logger = new Mock<ILogger<LoginCommandHandler>>(MockBehavior.Loose);
+
+        var sut = new LoginCommandHandler(repo.Object, password.Object, token.Object, mapper, logger.Object);
         var cmd = new LoginCommand(new LoginRequestDto { Email = "a@b.com", Password = "bad" });
 
         // Act
@@ -65,7 +70,7 @@ public sealed class LoginCommandHandlerTests
 
     [Fact]
     public async Task Handle_ValidCredentials_ReturnsTokens_AndPersistsRefreshToken()
-        {
+    {
         // Arrange
         var user = new User { Id = Guid.NewGuid(), Email = "a@b.com", UserName = "user", PasswordHash = "hash" };
 
@@ -79,7 +84,7 @@ public sealed class LoginCommandHandlerTests
         // on vérifie que l'update reçoit bien l'instance trackée, avec le refresh token défini
         repo.Setup(r => r.Update(It.Is<User>(u =>
             ReferenceEquals(u, trackedUser) &&
-            u.RefreshToken == "refresh" &&
+            u.RefreshTokenHash == "refresh" &&
             u.RefreshTokenExpiryTime > DateTime.UtcNow
         ))).Returns(Task.CompletedTask);
 
@@ -92,7 +97,9 @@ public sealed class LoginCommandHandlerTests
 
         var mapper = MapperFactory.Create();
 
-        var sut = new LoginCommandHandler(repo.Object, password.Object, token.Object, mapper);
+        var logger = new Mock<ILogger<LoginCommandHandler>>(MockBehavior.Loose);
+
+        var sut = new LoginCommandHandler(repo.Object, password.Object, token.Object, mapper, logger.Object);
         var cmd = new LoginCommand(new LoginRequestDto { Email = "a@b.com", Password = "Secret#123" });
 
         // Act
@@ -126,7 +133,9 @@ public sealed class LoginCommandHandlerTests
 
         var mapper = MapperFactory.Create();
 
-        var sut = new LoginCommandHandler(repo.Object, password.Object, token.Object, mapper);
+        var logger = new Mock<ILogger<LoginCommandHandler>>(MockBehavior.Loose);
+
+        var sut = new LoginCommandHandler(repo.Object, password.Object, token.Object, mapper, logger.Object);
         var cmd = new LoginCommand(new LoginRequestDto { Email = "a@b.com", Password = "Secret#123" });
 
         // Act

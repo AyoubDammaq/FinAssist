@@ -5,6 +5,7 @@ using AuthService.Domain.Entities;
 using AuthService.Domain.Interfaces;
 using FluentAssertions;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace AuthService.UnitTests.Application.Commands.ChangePassword;
@@ -16,8 +17,16 @@ public sealed class ChangePasswordCommandHandlerTests
     {
         var repo = new Mock<IUserRepository>(MockBehavior.Strict);
         var password = new Mock<IPasswordManagement>(MockBehavior.Strict);
+        var logger = new Mock<ILogger<ChangePasswordCommandHandler>>(MockBehavior.Strict);
 
-        var sut = new ChangePasswordCommandHandler(repo.Object, password.Object);
+        logger.Setup(x => x.Log(
+            It.IsAny<LogLevel>(),
+            It.IsAny<EventId>(),
+            It.IsAny<It.IsAnyType>(),
+            It.IsAny<Exception>(),
+            (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()));
+
+        var sut = new ChangePasswordCommandHandler(repo.Object, password.Object, logger.Object);
 
         var cmd = new ChangePasswordCommand(
             new ChangePasswordRequestDto
@@ -39,8 +48,16 @@ public sealed class ChangePasswordCommandHandlerTests
     {
         var repo = new Mock<IUserRepository>(MockBehavior.Strict);
         var password = new Mock<IPasswordManagement>(MockBehavior.Strict);
+        var logger = new Mock<ILogger<ChangePasswordCommandHandler>>(MockBehavior.Strict);
 
-        var sut = new ChangePasswordCommandHandler(repo.Object, password.Object);
+        logger.Setup(x => x.Log(
+            It.IsAny<LogLevel>(),
+            It.IsAny<EventId>(),
+            It.IsAny<It.IsAnyType>(),
+            It.IsAny<Exception>(),
+            (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()));
+
+        var sut = new ChangePasswordCommandHandler(repo.Object, password.Object, logger.Object);
 
         var cmd = new ChangePasswordCommand(
             new ChangePasswordRequestDto
@@ -68,7 +85,16 @@ public sealed class ChangePasswordCommandHandlerTests
         var password = new Mock<IPasswordManagement>(MockBehavior.Strict);
         password.Setup(p => p.IsPasswordStrong(It.IsAny<string>())).ReturnsAsync(true);
 
-        var sut = new ChangePasswordCommandHandler(repo.Object, password.Object);
+        var logger = new Mock<ILogger<ChangePasswordCommandHandler>>(MockBehavior.Strict);
+
+        logger.Setup(x => x.Log(
+            It.IsAny<LogLevel>(),
+            It.IsAny<EventId>(),
+            It.IsAny<It.IsAnyType>(),
+            It.IsAny<Exception>(),
+            (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()));
+
+        var sut = new ChangePasswordCommandHandler(repo.Object, password.Object, logger.Object);
 
         var cmd = new ChangePasswordCommand(
             new ChangePasswordRequestDto
@@ -100,7 +126,16 @@ public sealed class ChangePasswordCommandHandlerTests
         password.Setup(p => p.IsPasswordStrong(It.IsAny<string>())).ReturnsAsync(true);
         password.Setup(p => p.VerifyPassword("bad", "hash", user)).ReturnsAsync(false);
 
-        var sut = new ChangePasswordCommandHandler(repo.Object, password.Object);
+        var logger = new Mock<ILogger<ChangePasswordCommandHandler>>(MockBehavior.Strict);
+
+        logger.Setup(x => x.Log(
+            It.IsAny<LogLevel>(),
+            It.IsAny<EventId>(),
+            It.IsAny<It.IsAnyType>(),
+            It.IsAny<Exception>(),
+            (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()));
+
+        var sut = new ChangePasswordCommandHandler(repo.Object, password.Object, logger.Object);
 
         var cmd = new ChangePasswordCommand(
             new ChangePasswordRequestDto
@@ -142,7 +177,16 @@ public sealed class ChangePasswordCommandHandlerTests
         password.Setup(p => p.VerifyPassword("Old#12345", "hash", user)).ReturnsAsync(true);
         password.Setup(p => p.HashPassword("New#12345")).ReturnsAsync(("newhash", "salt"));
 
-        var sut = new ChangePasswordCommandHandler(repo.Object, password.Object);
+        var logger = new Mock<ILogger<ChangePasswordCommandHandler>>(MockBehavior.Strict);
+
+        logger.Setup(x => x.Log(
+            It.IsAny<LogLevel>(),
+            It.IsAny<EventId>(),
+            It.IsAny<It.IsAnyType>(),
+            It.IsAny<Exception>(),
+            (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()));
+
+        var sut = new ChangePasswordCommandHandler(repo.Object, password.Object, logger.Object);
 
         var cmd = new ChangePasswordCommand(
             new ChangePasswordRequestDto

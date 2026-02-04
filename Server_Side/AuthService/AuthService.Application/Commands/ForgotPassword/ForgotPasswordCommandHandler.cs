@@ -1,17 +1,20 @@
 using AuthService.Application.Utils;
 using AuthService.Domain.Interfaces;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace AuthService.Application.Commands.ForgotPassword
 {
     public sealed class ForgotPasswordCommandHandler(
         IUserRepository userRepository,
         ITokenManagement tokenManagement,
-        IEmailManagment emailManagment) : IRequestHandler<ForgotPasswordCommand, Unit>
+        IEmailManagment emailManagment,
+        ILogger<ForgotPasswordCommandHandler> logger) : IRequestHandler<ForgotPasswordCommand, Unit>
     {
         private readonly IUserRepository _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         private readonly ITokenManagement _tokenManagement = tokenManagement ?? throw new ArgumentNullException(nameof(tokenManagement));
         private readonly IEmailManagment _emailManagment = emailManagment ?? throw new ArgumentNullException(nameof(emailManagment));
+        private readonly ILogger<ForgotPasswordCommandHandler> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         public async Task<Unit> Handle(ForgotPasswordCommand request, CancellationToken cancellationToken)
         {
@@ -19,6 +22,7 @@ namespace AuthService.Application.Commands.ForgotPassword
 
             if (string.IsNullOrWhiteSpace(email))
             {
+                _logger.LogWarning("Tentative de réinitialisation de mot de passe sans email fourni.");
                 throw new ArgumentException("Email requis.");
             }
 
@@ -27,43 +31,44 @@ namespace AuthService.Application.Commands.ForgotPassword
             {
                 canSend = await _emailManagment.CheckEmailValidation(email, cancellationToken).ConfigureAwait(false);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Erreur lors de la validation de l'email {Email}.", email);
                 canSend = false;
             }
 
             if (!canSend)
             {
+                _logger.LogInformation("Validation de l'email échouée ou email non autorisé pour {Email}.", email);
                 return Unit.Value;
             }
 
-            // Récupérer l'utilisateur (possible double lecture, acceptable ; optimisation possible)
             var normalized = email.ToLowerInvariant();
             var user = await _userRepository.GetByEmail(normalized).ConfigureAwait(false);
             if (user == null)
             {
-                // Course condition improbable : ne pas divulguer
+                _logger.LogInformation("Aucun utilisateur trouvé pour l'email {Email}.", normalized);
                 return Unit.Value;
             }
 
             var resetToken = await _tokenManagement.GenerateResetToken().ConfigureAwait(false);
-            user.ResetToken = resetToken;
+            var resetTokenHash = _tokenManagement.HashToken(resetToken);
+
+            user.ResetTokenHash = resetTokenHash;
             user.ResetTokenExpiryTime = DateTime.UtcNow.AddMinutes(15);
             user.UpdatedAt = DateTime.UtcNow;
 
             await _userRepository.Update(user).ConfigureAwait(false);
+            _logger.LogInformation("Token de réinitialisation généré et enregistré pour l'utilisateur {UserId}.", user.Id);
 
-            // Tenter d'envoyer l'email (ne pas propager l'exception vers l'appelant)
-            try
+            var emailSent = await _emailManagment.SendPasswordResetEmailAsync(email, resetToken, cancellationToken).ConfigureAwait(false);
+            if (!emailSent)
             {
-                await _emailManagment.SendPasswordResetEmailAsync(email, resetToken, cancellationToken).ConfigureAwait(false);
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine($"Failed to send password reset email to {email}: {ex.Message}");
-                Console.WriteLine(ex.ToString());
+                _logger.LogError("Échec lors de l'envoi de l'e-mail de réinitialisation à {Email}.", email);
+                throw new InvalidOperationException("Échec lors de l'envoi de l'e-mail de réinitialisation.");
             }
 
+            _logger.LogInformation("E-mail de réinitialisation envoyé avec succès à {Email}.", email);
             return Unit.Value;
         }
     }

@@ -3,6 +3,7 @@ using AuthService.Domain.Entities;
 using AuthService.Domain.Interfaces;
 using AuthService.UnitTests.TestUtils;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace AuthService.UnitTests.Application.Queries.GetAllUsers;
@@ -23,7 +24,9 @@ public sealed class GetAllUsersQueryHandlerTests
         repo.Setup(r => r.GetAll()).ReturnsAsync(users);
 
         var mapper = MapperFactory.Create();
-        var sut = new GetAllUsersQueryHandler(repo.Object, mapper);
+        var logger = new Mock<ILogger<GetAllUsersQueryHandler>>(MockBehavior.Loose);
+
+        var sut = new GetAllUsersQueryHandler(repo.Object, mapper, logger.Object);
 
         // Act
         var result = await sut.Handle(new GetAllUsersQuery(), CancellationToken.None);
@@ -46,7 +49,9 @@ public sealed class GetAllUsersQueryHandlerTests
         repo.Setup(r => r.GetAll()).ThrowsAsync(new InvalidOperationException("boom"));
 
         var mapper = MapperFactory.Create();
-        var sut = new GetAllUsersQueryHandler(repo.Object, mapper);
+        var logger = new Mock<ILogger<GetAllUsersQueryHandler>>(MockBehavior.Loose);
+
+        var sut = new GetAllUsersQueryHandler(repo.Object, mapper, logger.Object);
 
         // Act
         var act = () => sut.Handle(new GetAllUsersQuery(), CancellationToken.None);

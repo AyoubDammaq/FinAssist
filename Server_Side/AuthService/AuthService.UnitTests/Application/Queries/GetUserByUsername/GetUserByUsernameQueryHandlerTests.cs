@@ -3,6 +3,7 @@ using AuthService.Domain.Entities;
 using AuthService.Domain.Interfaces;
 using AuthService.UnitTests.TestUtils;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace AuthService.UnitTests.Application.Queries.GetUserByUsername;
@@ -19,7 +20,10 @@ public sealed class GetUserByUsernameQueryHandlerTests
         repo.Setup(r => r.GetByUsername("user")).ReturnsAsync(user);
 
         var mapper = MapperFactory.Create();
-        var sut = new GetUserByUsernameQueryHandler(repo.Object, mapper);
+        var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+        var logger = loggerFactory.CreateLogger<GetUserByUsernameQueryHandler>();
+
+        var sut = new GetUserByUsernameQueryHandler(repo.Object, mapper, logger);
 
         // Act
         var result = await sut.Handle(new GetUserByUsernameQuery("user"), CancellationToken.None);
@@ -38,7 +42,10 @@ public sealed class GetUserByUsernameQueryHandlerTests
         repo.Setup(r => r.GetByUsername("missing")).ReturnsAsync((User?)null);
 
         var mapper = MapperFactory.Create();
-        var sut = new GetUserByUsernameQueryHandler(repo.Object, mapper);
+        var loggerFactory = LoggerFactory.Create(builder => { });
+        var logger = loggerFactory.CreateLogger<GetUserByUsernameQueryHandler>();
+
+        var sut = new GetUserByUsernameQueryHandler(repo.Object, mapper, logger);
 
         // Act
         var act = () => sut.Handle(new GetUserByUsernameQuery("missing"), CancellationToken.None);
@@ -58,7 +65,10 @@ public sealed class GetUserByUsernameQueryHandlerTests
         repo.Setup(r => r.GetByUsername("user")).ThrowsAsync(new InvalidOperationException("boom"));
 
         var mapper = MapperFactory.Create();
-        var sut = new GetUserByUsernameQueryHandler(repo.Object, mapper);
+        var loggerFactory = LoggerFactory.Create(builder => { });
+        var logger = loggerFactory.CreateLogger<GetUserByUsernameQueryHandler>();
+
+        var sut = new GetUserByUsernameQueryHandler(repo.Object, mapper, logger);
 
         // Act
         var act = () => sut.Handle(new GetUserByUsernameQuery("user"), CancellationToken.None);

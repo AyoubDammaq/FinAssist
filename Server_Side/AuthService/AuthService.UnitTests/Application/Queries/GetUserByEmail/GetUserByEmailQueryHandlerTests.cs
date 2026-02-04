@@ -3,6 +3,7 @@ using AuthService.Domain.Entities;
 using AuthService.Domain.Interfaces;
 using AuthService.UnitTests.TestUtils;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace AuthService.UnitTests.Application.Queries.GetUserByEmail;
@@ -19,7 +20,10 @@ public sealed class GetUserByEmailQueryHandlerTests
         repo.Setup(r => r.GetByEmail("a@b.com")).ReturnsAsync(user);
 
         var mapper = MapperFactory.Create();
-        var sut = new GetUserByEmailQueryHandler(repo.Object, mapper);
+        var loggerFactory = LoggerFactory.Create(builder => { });
+        var logger = loggerFactory.CreateLogger<GetUserByEmailQueryHandler>();
+
+        var sut = new GetUserByEmailQueryHandler(repo.Object, mapper, logger);
 
         // Act
         var result = await sut.Handle(new GetUserByEmailQuery("a@b.com"), CancellationToken.None);
@@ -38,7 +42,10 @@ public sealed class GetUserByEmailQueryHandlerTests
         repo.Setup(r => r.GetByEmail("missing@b.com")).ReturnsAsync((User?)null);
 
         var mapper = MapperFactory.Create();
-        var sut = new GetUserByEmailQueryHandler(repo.Object, mapper);
+        var loggerFactory = LoggerFactory.Create(builder => { });
+        var logger = loggerFactory.CreateLogger<GetUserByEmailQueryHandler>();
+
+        var sut = new GetUserByEmailQueryHandler(repo.Object, mapper, logger);
 
         // Act
         var act = () => sut.Handle(new GetUserByEmailQuery("missing@b.com"), CancellationToken.None);
@@ -58,7 +65,10 @@ public sealed class GetUserByEmailQueryHandlerTests
         repo.Setup(r => r.GetByEmail("a@b.com")).ThrowsAsync(new InvalidOperationException("boom"));
 
         var mapper = MapperFactory.Create();
-        var sut = new GetUserByEmailQueryHandler(repo.Object, mapper);
+        var loggerFactory = LoggerFactory.Create(builder => { });
+        var logger = loggerFactory.CreateLogger<GetUserByEmailQueryHandler>();
+
+        var sut = new GetUserByEmailQueryHandler(repo.Object, mapper, logger);
 
         // Act
         var act = () => sut.Handle(new GetUserByEmailQuery("a@b.com"), CancellationToken.None);

@@ -3,6 +3,7 @@ using AuthService.Domain.Entities;
 using AuthService.Domain.Interfaces;
 using AuthService.UnitTests.TestUtils;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace AuthService.UnitTests.Application.Queries.GetUserById;
@@ -20,7 +21,10 @@ public sealed class GetUserByIdQueryHandlerTests
         repo.Setup(r => r.GetById(userId)).ReturnsAsync(user);
 
         var mapper = MapperFactory.Create();
-        var sut = new GetUserByIdQueryHandler(repo.Object, mapper);
+        var loggerFactory = LoggerFactory.Create(builder => { });
+        var logger = loggerFactory.CreateLogger<GetUserByIdQueryHandler>();
+
+        var sut = new GetUserByIdQueryHandler(repo.Object, mapper, logger);
 
         // Act
         var result = await sut.Handle(new GetUserByIdQuery(userId), CancellationToken.None);
@@ -43,7 +47,10 @@ public sealed class GetUserByIdQueryHandlerTests
         repo.Setup(r => r.GetById(userId)).ReturnsAsync((User?)null);
 
         var mapper = MapperFactory.Create();
-        var sut = new GetUserByIdQueryHandler(repo.Object, mapper);
+        var loggerFactory = LoggerFactory.Create(builder => { });
+        var logger = loggerFactory.CreateLogger<GetUserByIdQueryHandler>();
+
+        var sut = new GetUserByIdQueryHandler(repo.Object, mapper, logger);
 
         // Act
         var act = () => sut.Handle(new GetUserByIdQuery(userId), CancellationToken.None);
@@ -65,7 +72,10 @@ public sealed class GetUserByIdQueryHandlerTests
         repo.Setup(r => r.GetById(userId)).ThrowsAsync(new InvalidOperationException("boom"));
 
         var mapper = MapperFactory.Create();
-        var sut = new GetUserByIdQueryHandler(repo.Object, mapper);
+        var loggerFactory = LoggerFactory.Create(builder => { });
+        var logger = loggerFactory.CreateLogger<GetUserByIdQueryHandler>();
+
+        var sut = new GetUserByIdQueryHandler(repo.Object, mapper, logger);
 
         // Act
         var act = () => sut.Handle(new GetUserByIdQuery(userId), CancellationToken.None);

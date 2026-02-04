@@ -5,6 +5,7 @@ using AuthService.Domain.Entities;
 using AuthService.Domain.Interfaces;
 using AuthService.UnitTests.TestUtils;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace AuthService.UnitTests.Application.Commands.Register;
@@ -23,7 +24,9 @@ public sealed class RegisterCommandHandlerTests
         var password = new Mock<IPasswordManagement>(MockBehavior.Loose);
         var mapper = MapperFactory.Create();
 
-        var sut = new RegisterCommandHandler(repo.Object, password.Object, mapper);
+        var logger = new Mock<ILogger<RegisterCommandHandler>>();
+
+        var sut = new RegisterCommandHandler(repo.Object, password.Object, mapper, logger.Object);
 
         var cmd = new RegisterCommand(new RegisterRequestDto
         {
@@ -58,7 +61,9 @@ public sealed class RegisterCommandHandlerTests
 
         var mapper = MapperFactory.Create();
 
-        var sut = new RegisterCommandHandler(repo.Object, password.Object, mapper);
+        var logger = new Mock<ILogger<RegisterCommandHandler>>();
+
+        var sut = new RegisterCommandHandler(repo.Object, password.Object, mapper, logger.Object);
 
         var cmd = new RegisterCommand(new RegisterRequestDto
         {
