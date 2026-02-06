@@ -35,13 +35,11 @@ export class ForgotPassword {
 
       this.authService.forgotPassword(forgotPasswordData).subscribe({
         next: () => {
-          console.log('Password reset email sent');
           this.isSubmitting = false;
           this.emailSent = true;
         },
         error: (error) => {
-          console.error('Forgot password error:', error);
-          this.errorMessage = error.message || "Erreur lors de l'envoi de l'email";
+          this.errorMessage = error?.error?.message || 'Failed to send reset email. Please try again.';
           this.isSubmitting = false;
         },
       });

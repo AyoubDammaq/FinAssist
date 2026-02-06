@@ -185,8 +185,6 @@ namespace AuthService.API.Controllers
             => ExecuteAsync(async () =>
             {
                 await _mediator.Send(new ForgotPasswordCommand(dto), cancellationToken);
-
-                // Message volontairement neutre (sécurité : éviter d'indiquer si l'email existe).
                 return Ok(new { message = "Si un compte existe pour cet e-mail, un message de réinitialisation a été envoyé." });
             });
 

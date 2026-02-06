@@ -8,12 +8,14 @@ namespace AuthService.Application.Commands.ResetPassword
     public sealed class ResetPasswordCommandHandler(
         IUserRepository userRepository,
         IPasswordManagement passwordManagement,
+        ITokenManagement tokenManagement,
         IEmailManagment emailManagment,
         ILogger<ResetPasswordCommandHandler> logger)
         : IRequestHandler<ResetPasswordCommand, Unit>
     {
         private readonly IUserRepository _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         private readonly IPasswordManagement _passwordManagement = passwordManagement ?? throw new ArgumentNullException(nameof(passwordManagement));
+        private readonly ITokenManagement _tokenManagement = tokenManagement ?? throw new ArgumentNullException(nameof(tokenManagement));
         private readonly IEmailManagment _emailManagment = emailManagment ?? throw new ArgumentNullException(nameof(emailManagment));
         private readonly ILogger<ResetPasswordCommandHandler> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -54,7 +56,7 @@ namespace AuthService.Application.Commands.ResetPassword
             }
 
             if (string.IsNullOrWhiteSpace(user.ResetTokenHash) ||
-                !string.Equals(user.ResetTokenHash, dto.ResetToken, StringComparison.Ordinal) ||
+                !string.Equals(user.ResetTokenHash, _tokenManagement.HashToken(dto.ResetToken), StringComparison.Ordinal) ||
                 !user.ResetTokenExpiryTime.HasValue ||
                 user.ResetTokenExpiryTime.Value <= DateTime.UtcNow)
             {

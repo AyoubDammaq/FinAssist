@@ -7,7 +7,6 @@ using FluentAssertions;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Newtonsoft.Json.Linq;
 
 namespace AuthService.UnitTests.Application.Commands.ResetPassword;
 
@@ -18,10 +17,11 @@ public sealed class ResetPasswordCommandHandlerTests
     {
         var repo = new Mock<IUserRepository>(MockBehavior.Strict);
         var password = new Mock<IPasswordManagement>(MockBehavior.Strict);
+        var token = new Mock<ITokenManagement>(MockBehavior.Strict);
         var email = new Mock<IEmailManagment>(MockBehavior.Strict);
         var logger = new Mock<ILogger<ResetPasswordCommandHandler>>();
 
-        var sut = new ResetPasswordCommandHandler(repo.Object, password.Object, email.Object, logger.Object);
+        var sut = new ResetPasswordCommandHandler(repo.Object, password.Object, token.Object, email.Object, logger.Object);
 
         var cmd = new ResetPasswordCommand(new ResetPasswordRequestDto
         {
@@ -42,10 +42,11 @@ public sealed class ResetPasswordCommandHandlerTests
     {
         var repo = new Mock<IUserRepository>(MockBehavior.Strict);
         var password = new Mock<IPasswordManagement>(MockBehavior.Strict);
+        var token = new Mock<ITokenManagement>(MockBehavior.Strict);    
         var email = new Mock<IEmailManagment>(MockBehavior.Strict);
         var logger = new Mock<ILogger<ResetPasswordCommandHandler>>();
 
-        var sut = new ResetPasswordCommandHandler(repo.Object, password.Object, email.Object, logger.Object);
+        var sut = new ResetPasswordCommandHandler(repo.Object, password.Object, token.Object, email.Object, logger.Object);
 
         var cmd = new ResetPasswordCommand(new ResetPasswordRequestDto
         {
@@ -70,10 +71,13 @@ public sealed class ResetPasswordCommandHandlerTests
         var password = new Mock<IPasswordManagement>(MockBehavior.Strict);
         password.Setup(p => p.IsPasswordStrong(It.IsAny<string>())).ReturnsAsync(true);
 
+        var token = new Mock<ITokenManagement>(MockBehavior.Strict);
+        token.Setup(t => t.HashToken(It.IsAny<string>())).Returns("hashed_token");
+
         var email = new Mock<IEmailManagment>(MockBehavior.Strict);
         var logger = new Mock<ILogger<ResetPasswordCommandHandler>>();
 
-        var sut = new ResetPasswordCommandHandler(repo.Object, password.Object, email.Object, logger.Object);
+        var sut = new ResetPasswordCommandHandler(repo.Object, password.Object, token.Object, email.Object, logger.Object);
 
         var cmd = new ResetPasswordCommand(new ResetPasswordRequestDto
         {
@@ -109,10 +113,13 @@ public sealed class ResetPasswordCommandHandlerTests
         var password = new Mock<IPasswordManagement>(MockBehavior.Strict);
         password.Setup(p => p.IsPasswordStrong(It.IsAny<string>())).ReturnsAsync(true);
 
+        var token = new Mock<ITokenManagement>(MockBehavior.Strict);
+        token.Setup(t => t.HashToken(It.IsAny<string>())).Returns("hashed_token");
+
         var email = new Mock<IEmailManagment>(MockBehavior.Strict);
         var logger = new Mock<ILogger<ResetPasswordCommandHandler>>();
 
-        var sut = new ResetPasswordCommandHandler(repo.Object, password.Object, email.Object, logger.Object);
+        var sut = new ResetPasswordCommandHandler(repo.Object, password.Object, token.Object, email.Object, logger.Object);
 
         var cmd = new ResetPasswordCommand(new ResetPasswordRequestDto
         {
@@ -149,10 +156,13 @@ public sealed class ResetPasswordCommandHandlerTests
         var password = new Mock<IPasswordManagement>(MockBehavior.Strict);
         password.Setup(p => p.IsPasswordStrong(It.IsAny<string>())).ReturnsAsync(true);
 
+        var token = new Mock<ITokenManagement>(MockBehavior.Strict);
+        token.Setup(t => t.HashToken("token.input")).Returns("token.other");
+
         var email = new Mock<IEmailManagment>(MockBehavior.Strict);
         var logger = new Mock<ILogger<ResetPasswordCommandHandler>>();
 
-        var sut = new ResetPasswordCommandHandler(repo.Object, password.Object, email.Object, logger.Object);
+        var sut = new ResetPasswordCommandHandler(repo.Object, password.Object, token.Object, email.Object, logger.Object);
 
         var cmd = new ResetPasswordCommand(new ResetPasswordRequestDto
         {
@@ -189,10 +199,13 @@ public sealed class ResetPasswordCommandHandlerTests
         var password = new Mock<IPasswordManagement>(MockBehavior.Strict);
         password.Setup(p => p.IsPasswordStrong(It.IsAny<string>())).ReturnsAsync(true);
 
+        var token = new Mock<ITokenManagement>(MockBehavior.Strict);
+        token.Setup(t => t.HashToken("token")).Returns("token");
+
         var email = new Mock<IEmailManagment>(MockBehavior.Strict);
         var logger = new Mock<ILogger<ResetPasswordCommandHandler>>();
 
-        var sut = new ResetPasswordCommandHandler(repo.Object, password.Object, email.Object, logger.Object);
+        var sut = new ResetPasswordCommandHandler(repo.Object, password.Object, token.Object, email.Object, logger.Object);
 
         var cmd = new ResetPasswordCommand(new ResetPasswordRequestDto
         {
@@ -232,11 +245,14 @@ public sealed class ResetPasswordCommandHandlerTests
         password.Setup(p => p.IsPasswordStrong(It.IsAny<string>())).ReturnsAsync(true);
         password.Setup(p => p.HashPassword("New#12345")).ReturnsAsync(("hash.new", "salt"));
 
+        var token = new Mock<ITokenManagement>(MockBehavior.Strict);
+        token.Setup(t => t.HashToken("token")).Returns("token");
+
         var email = new Mock<IEmailManagment>(MockBehavior.Strict);
         email.Setup(e => e.SendPasswordChangedEmail("a@b.com", It.IsAny<CancellationToken>())).ReturnsAsync(true);
         var logger = new Mock<ILogger<ResetPasswordCommandHandler>>();
 
-        var sut = new ResetPasswordCommandHandler(repo.Object, password.Object, email.Object, logger.Object);
+        var sut = new ResetPasswordCommandHandler(repo.Object, password.Object, token.Object, email.Object, logger.Object);
 
         var cmd = new ResetPasswordCommand(new ResetPasswordRequestDto
         {
