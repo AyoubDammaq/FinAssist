@@ -1,0 +1,43 @@
+services:
+  db:
+    build:
+      context: .
+      dockerfile: db/Dockerfile.db
+    image: ayoub966/transaction-db:1.0.1
+    container_name: transaction-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: TransactionDB
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=en_US.utf8 --lc-ctype=en_US.utf8"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d TransactionDB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  transactionservice:
+    build:
+      context: .
+      dockerfile: TransactionService.API/Dockerfile
+    image: ayoub966/transactionservice:1.0.1
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__AuthConnection: "Host=db;Port=5432;Database=TransactionDB;Username=postgres;Password=postgres"
+      ASPNETCORE_URLS: "http://+:8082"
+      ASPNETCORE_ENVIRONMENT: "Development"
+    ports:
+      - "8082:8082"
+    restart: unless-stopped
+
+volumes:
+  db-data:

@@ -1,59 +1,37 @@
-# AuthModule
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.7.
+# AuthModule Overview
 
-## Development server
+This project is an Angular-based authentication module designed to provide secure and user-friendly authentication workflows, including login, registration, password management, and user profile features.
 
-To start a local development server, run:
+## Project Structure
+- **src/app/auth/components/**: Contains all authentication-related UI components (login, register, change-password, etc.), each in its own folder with HTML, CSS, TypeScript, and test files.
+- **src/app/auth/services/auth.service.ts**: Central service for authentication logic and API communication.
+- **src/app/auth/interceptors/auth.interceptor.ts**: Handles HTTP request interception for authentication tokens.
+- **src/app/auth/models/auth.models.ts**: Defines TypeScript interfaces and types for authentication data.
+- **src/app/auth/guards/**: (If present) Route guards for protecting authenticated routes.
+- **src/app/app.routes.ts**: Application route definitions, including auth routes.
 
-```bash
-ng serve
-```
+## Key Features
+- **Reactive Forms**: All forms use Angular Reactive Forms for validation and state management.
+- **Password Management**: Change, reset, and forgot password flows with UI feedback and validation.
+- **Token Handling**: Auth tokens are managed via HTTP interceptors for secure API requests.
+- **Component Isolation**: Each feature is modular and easy to extend or maintain.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Developer Workflows
+- **Start Dev Server**: `ng serve` (or `npm start` if configured)
+- **Build**: `ng build`
+- **Unit Tests**: `ng test`
+- **Scaffold Components**: `ng generate component <name>`
 
-## Code scaffolding
+## Custom Patterns
+- **Password Visibility**: Password fields use toggle logic for show/hide (see change-password component).
+- **Form Feedback**: Error and success messages are displayed using template bindings and component state.
+- **Navigation**: Uses Angular Router (`routerLink`) for navigation between auth pages.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Extending the Module
+- Add new features by creating a new folder in `components/` and updating routes as needed.
+- Place shared logic in `services/` and shared types in `models/`.
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## References
+- See each component folder for implementation details and best practices.
+- For Angular CLI usage, see the official [Angular CLI documentation](https://angular.dev/tools/cli).

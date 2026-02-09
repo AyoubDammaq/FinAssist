@@ -1,0 +1,43 @@
+services:
+  db:
+    build:
+      context: ./Server_Side/AuthService/db
+      dockerfile: Dockerfile.db
+    image: ayoub966/auth-db:1.0.1
+    container_name: auth-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: UserDB
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=en_US.utf8 --lc-ctype=en_US.utf8"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./Server_Side/AuthService/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d UserDB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  authservice:
+    build:
+      context: ./Server_Side/AuthService
+      dockerfile: AuthService.API/Dockerfile
+    image: ayoub966/authservice:1.0.1
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__AuthConnection: "Host=db;Port=5432;Database=UserDB;Username=postgres;Password=postgres"
+      ASPNETCORE_URLS: "http://+:8080"
+      ASPNETCORE_ENVIRONMENT: "Development"
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  db-data:

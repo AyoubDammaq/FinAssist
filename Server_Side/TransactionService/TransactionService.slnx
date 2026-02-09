@@ -1,3 +1,7 @@
 <Solution>
-  <Project Path="TransactionService.csproj" />
+  <Project Path="TransactionService.Application/TransactionService.Application.csproj" Id="04ee7030-acfa-4e5f-81cd-ae37d0673308" />
+  <Project Path="TransactionService.Domain/TransactionService.Domain.csproj" Id="90fd1344-8349-4bec-b587-bcb261739eed" />
+  <Project Path="TransactionService.Infrastructure/TransactionService.Infrastructure.csproj" Id="a6b6db87-93ca-47cd-96c5-db72a7987d80" />
+  <Project Path="TransactionService.UnitTests/TransactionService.UnitTests.csproj" Id="ba9a9c4a-f833-4109-bb45-900bbf918f66" />
+  <Project Path="TransactionService.API/TransactionService.API.csproj" />
 </Solution>
