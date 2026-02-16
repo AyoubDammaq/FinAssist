@@ -7,7 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Commands\Transaction\UpdateTransaction\**" />
+    <EmbeddedResource Remove="Commands\Transaction\UpdateTransaction\**" />
+    <None Remove="Commands\Transaction\UpdateTransaction\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TransactionService.Domain\TransactionService.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Commands\Transaction\UpdateTransaction - Copier\" />
   </ItemGroup>
 
 </Project>
