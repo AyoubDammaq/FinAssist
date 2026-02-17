@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MediatR;
+using TransactionService.Application.DTOs;
 
 namespace TransactionService.Application.Queries.Category.GetAllCategories
 {
-    internal class GetAllCategoriesQuery
-    {
-    }
+    public record GetAllCategoriesQuery() : IRequest<IEnumerable<CategoryDto>>;
 }

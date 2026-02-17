@@ -8,7 +8,9 @@ namespace TransactionService.Domain.Interfaces
         Task UpdateCategoryAsync(Category category);
         Task DeleteCategoryAsync(Guid categoryId);
         Task<Category?> GetCategoryByIdAsync(Guid categoryId);
+        Task<Category?> GetCategoryByNameAsync(string categoryName);
         Task<IEnumerable<Category>> GetCategoriesByUserIdAsync(Guid userId);
         Task<IEnumerable<Category>> GetAllCategoriesAsync();
+        Task<bool> CategoryExistsAsync(string categoryName);
     }
 }

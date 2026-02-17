@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MediatR;
 
 namespace TransactionService.Application.Commands.Category.DeleteCategory
 {
-    internal class DeleteCategoryCommand
-    {
-    }
+    public record DeleteCategoryCommand(Guid categoryId) : IRequest<bool>;
 }

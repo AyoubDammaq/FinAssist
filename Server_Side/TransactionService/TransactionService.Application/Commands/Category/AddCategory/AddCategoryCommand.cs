@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MediatR;
+using TransactionService.Application.DTOs;
 
 namespace TransactionService.Application.Commands.Category.AddCategory
 {
-    internal class AddCategoryCommand
-    {
-    }
+    public record AddCategoryCommand(AddCategoryRequest addCategoryRequest) : IRequest<bool>;
 }

@@ -36,12 +36,25 @@ namespace TransactionService.Infrastructure.Repositories
             return await _transactionDbContext.Categories.FindAsync(categoryId);
         }
 
+        public async Task<Category?> GetCategoryByNameAsync(string categoryName)
+        {
+            return await _transactionDbContext.Categories
+                .FirstOrDefaultAsync(c => c.Name == categoryName);
+        }
+
         public async Task<IEnumerable<Category>> GetCategoriesByUserIdAsync(Guid userId)
         {
             return await _transactionDbContext.Categories
                 .Where(c => c.UserId == userId)
                 .ToListAsync();
         }
+
+        public async Task<bool> CategoryExistsAsync(string categoryName)
+        {
+            return await _transactionDbContext.Categories
+                .AnyAsync(c => c.Name == categoryName);
+        }
+
         public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
         {
             return await _transactionDbContext.Categories.ToListAsync();

@@ -7,17 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Commands\Transaction\UpdateTransaction\**" />
-    <EmbeddedResource Remove="Commands\Transaction\UpdateTransaction\**" />
-    <None Remove="Commands\Transaction\UpdateTransaction\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\TransactionService.Domain\TransactionService.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Commands\Transaction\UpdateTransaction - Copier\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="16.0.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="MediatR" Version="14.0.0" />
   </ItemGroup>
 
 </Project>

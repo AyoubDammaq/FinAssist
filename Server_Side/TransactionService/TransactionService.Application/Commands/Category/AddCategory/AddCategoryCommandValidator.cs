@@ -1,10 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using FluentValidation;
 
 namespace TransactionService.Application.Commands.Category.AddCategory
 {
-    internal class AddCategoryCommandValidator
+    public class AddCategoryCommandValidator : AbstractValidator<AddCategoryCommand>
     {
+        public AddCategoryCommandValidator() { 
+            RuleFor(x => x.addCategoryRequest.Name)
+                .NotEmpty().WithMessage("Le nom de la catégorie est requis.")
+                .MaximumLength(100).WithMessage("Le nom de la catégorie ne peut pas dépasser 100 caractères.");
+        }
     }
 }

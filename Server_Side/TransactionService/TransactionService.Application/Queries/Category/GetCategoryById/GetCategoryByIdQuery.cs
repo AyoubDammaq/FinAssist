@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MediatR;
+using TransactionService.Application.DTOs;
 
 namespace TransactionService.Application.Queries.Category.GetCategoryById
 {
-    internal class GetCategoryByIdQuery
-    {
-    }
+    public record GetCategoryByIdQuery(Guid CategoryId) : IRequest<CategoryDto?>;
 }

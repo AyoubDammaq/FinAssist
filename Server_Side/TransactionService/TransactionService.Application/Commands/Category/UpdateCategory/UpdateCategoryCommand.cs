@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MediatR;
+using TransactionService.Application.DTOs;
 
 namespace TransactionService.Application.Commands.Category.UpdateCategory
 {
-    internal class UpdateCategoryCommand
-    {
-    }
+    public record UpdateCategoryCommand(UpdateCategoryRequest updateCategoryRequest) : IRequest<bool>;
 }
