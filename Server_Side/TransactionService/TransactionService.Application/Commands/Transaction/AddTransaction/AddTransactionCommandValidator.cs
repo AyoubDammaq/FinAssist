@@ -1,10 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using FluentValidation;
 
 namespace TransactionService.Application.Commands.Transaction.AddTransaction
 {
-    internal class AddTransactionCommandValidator
+    public class AddTransactionCommandValidator : AbstractValidator<AddTransactionCommand>
     {
+        public AddTransactionCommandValidator() 
+        {
+            RuleFor(x => x.addTransactionRequest.Amount)
+                .GreaterThan(0).WithMessage("Amount must be greater than zero.");
+        }
     }
 }

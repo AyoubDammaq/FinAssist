@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MediatR;
 
 namespace TransactionService.Application.Commands.Transaction.DeleteTransaction
 {
-    internal class DeleteTransactionCommand
-    {
-    }
+    public record DeleteTransactionCommand(Guid TransactionId) : IRequest<bool>;
 }

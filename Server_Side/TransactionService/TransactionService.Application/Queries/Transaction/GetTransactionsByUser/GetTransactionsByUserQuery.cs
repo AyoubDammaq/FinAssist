@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MediatR;
+using TransactionService.Application.DTOs;
 
 namespace TransactionService.Application.Queries.Transaction.GetTransactionsByUser
 {
-    internal class GetTransactionsByUserQuery
-    {
-    }
+    public record GetTransactionsByUserQuery(Guid UserId) : IRequest<IEnumerable<TransactionDto>>;
 }

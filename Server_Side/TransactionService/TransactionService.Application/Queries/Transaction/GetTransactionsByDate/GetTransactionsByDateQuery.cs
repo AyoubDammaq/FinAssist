@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MediatR;
+using TransactionService.Application.DTOs;
 
 namespace TransactionService.Application.Queries.Transaction.GetTransactionsByDate
 {
-    internal class GetTransactionsByDateQuery
-    {
-    }
+    public record GetTransactionsByDateQuery(DateTime Date) : IRequest<IEnumerable<TransactionDto>>;
 }

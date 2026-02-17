@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MediatR;
+using TransactionService.Application.DTOs;
 
 namespace TransactionService.Application.Commands.Transaction.AddTransaction
 {
-    internal class AddTransactionCommand
-    {
-    }
+    public record AddTransactionCommand(AddTransactionRequest addTransactionRequest, CancellationToken cancellationToken) : IRequest<bool>;
 }

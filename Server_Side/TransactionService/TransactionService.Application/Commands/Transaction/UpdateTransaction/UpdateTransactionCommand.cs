@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MediatR;
+using TransactionService.Application.DTOs;
 
 namespace TransactionService.Application.Commands.Transaction.UpdateTransaction
 {
-    internal class UpdateTransactionCommand
-    {
-    }
+    public record UpdateTransactionCommand(UpdateTransactionRequest updateTransactionRequest) : IRequest<bool>;
 }
